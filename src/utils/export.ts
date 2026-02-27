@@ -30,12 +30,12 @@ function downloadFile(content: string, filename: string, mimeType: string) {
 const MARGIN = 15; // mm
 const LINE_HEIGHT = 1.5;
 const COLORS = {
-  text: [26, 26, 46] as const,       // #1a1a2e
-  secondary: [73, 80, 87] as const,  // #495057
-  accent: [66, 99, 235] as const,    // #4263eb
-  code: [232, 62, 140] as const,     // #e83e8c
-  codeBg: [244, 245, 247] as const,  // #f4f5f7
-  border: [222, 226, 230] as const,  // #dee2e6
+  text: [26, 26, 46] as const, // #1a1a2e
+  secondary: [73, 80, 87] as const, // #495057
+  accent: [66, 99, 235] as const, // #4263eb
+  code: [232, 62, 140] as const, // #e83e8c
+  codeBg: [244, 245, 247] as const, // #f4f5f7
+  border: [222, 226, 230] as const, // #dee2e6
   blockquoteBg: [248, 249, 250] as const, // #f8f9fa
   tableBg: [248, 249, 250] as const, // #f8f9fa
 };
@@ -176,10 +176,7 @@ class PdfRenderer {
     this.pdf.setFillColor(...COLORS.codeBg);
     this.pdf.setDrawColor(...COLORS.border);
     this.pdf.setLineWidth(0.2);
-    const bgHeight = Math.min(
-      blockHeight,
-      this.pageHeight - MARGIN - this.y,
-    );
+    const bgHeight = Math.min(blockHeight, this.pageHeight - MARGIN - this.y);
     this.pdf.roundedRect(
       MARGIN,
       this.y,
@@ -256,8 +253,9 @@ class PdfRenderer {
     token.items.forEach((item, idx) => {
       const bullet = token.ordered ? `${idx + 1}.` : "•";
       const text = item.tokens
-        .filter((t): t is Tokens.Paragraph | Tokens.Text =>
-          t.type === "text" || t.type === "paragraph",
+        .filter(
+          (t): t is Tokens.Paragraph | Tokens.Text =>
+            t.type === "text" || t.type === "paragraph",
         )
         .map((t) =>
           "tokens" in t && t.tokens

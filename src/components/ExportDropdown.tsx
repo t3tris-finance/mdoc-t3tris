@@ -64,9 +64,7 @@ export default function ExportDropdown({
             </button>
             <button
               className="export-menu-item"
-              onClick={() =>
-                handleExport(() => exportAsPDF(docPath, title))
-              }
+              onClick={() => handleExport(() => exportAsPDF(docPath, title))}
             >
               📄 PDF (.pdf)
             </button>
