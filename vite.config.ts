@@ -16,4 +16,10 @@ export default defineConfig({
     }),
   ],
   assetsInclude: ["**/*.md"],
+  server: {
+    middlewareMode: false,
+  },
+  preview: {
+    middlewareMode: false,
+  },
 });
