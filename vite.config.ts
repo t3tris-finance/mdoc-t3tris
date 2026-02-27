@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { viteStaticCopy } from 'vite-plugin-static-copy'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { viteStaticCopy } from "vite-plugin-static-copy";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -9,11 +9,11 @@ export default defineConfig({
     viteStaticCopy({
       targets: [
         {
-          src: 'docs/**/*',
-          dest: 'docs',
+          src: "docs/**/*",
+          dest: "docs",
         },
       ],
     }),
   ],
-  assetsInclude: ['**/*.md'],
-})
+  assetsInclude: ["**/*.md"],
+});

@@ -35,12 +35,12 @@ Le site sera accessible sur `http://localhost:5173`.
 
 ## Structure du projet
 
-| Dossier/Fichier | Description |
-|---|---|
-| `docs/` | Vos fichiers Markdown de documentation |
-| `src/` | Code source de l'application React |
-| `public/` | Fichiers statiques |
-| `scripts/` | Scripts utilitaires (génération du manifest) |
+| Dossier/Fichier | Description                                  |
+| --------------- | -------------------------------------------- |
+| `docs/`         | Vos fichiers Markdown de documentation       |
+| `src/`          | Code source de l'application React           |
+| `public/`       | Fichiers statiques                           |
+| `scripts/`      | Scripts utilitaires (génération du manifest) |
 
 ## Commandes disponibles
 

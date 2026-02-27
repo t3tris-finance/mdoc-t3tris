@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import type { DocEntry } from '../utils/docs';
-import { docPathToRoute } from '../utils/docs';
+import { useState, useMemo } from "react";
+import { Link, useLocation } from "react-router-dom";
+import type { DocEntry } from "../utils/docs";
+import { docPathToRoute } from "../utils/docs";
 
 interface SidebarProps {
   entries: DocEntry[];
@@ -11,7 +11,7 @@ interface SidebarProps {
 
 export default function Sidebar({ entries, isOpen, onClose }: SidebarProps) {
   const location = useLocation();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
   const filteredEntries = useMemo(() => {
@@ -20,7 +20,10 @@ export default function Sidebar({ entries, isOpen, onClose }: SidebarProps) {
         .map((item) => {
           if (item.children) {
             const filtered = filterEntries(item.children, query);
-            if (filtered.length > 0 || item.title.toLowerCase().includes(query)) {
+            if (
+              filtered.length > 0 ||
+              item.title.toLowerCase().includes(query)
+            ) {
               return { ...item, children: filtered };
             }
             return null;
@@ -42,7 +45,7 @@ export default function Sidebar({ entries, isOpen, onClose }: SidebarProps) {
   return (
     <>
       {isOpen && <div className="sidebar-overlay" onClick={onClose} />}
-      <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+      <aside className={`sidebar ${isOpen ? "open" : ""}`}>
         <div className="search-box">
           <span className="search-icon">🔍</span>
           <input
@@ -79,15 +82,25 @@ interface SidebarItemProps {
   depth: number;
 }
 
-function SidebarItem({ entry, currentPath, collapsed, onToggle, onNavigate, depth }: SidebarItemProps) {
+function SidebarItem({
+  entry,
+  currentPath,
+  collapsed,
+  onToggle,
+  onNavigate,
+  depth,
+}: SidebarItemProps) {
   if (entry.children && entry.children.length > 0) {
     const isCollapsed = collapsed[entry.slug] ?? false;
 
     return (
       <div className="sidebar-section">
-        <div className="sidebar-section-title" onClick={() => onToggle(entry.slug)}>
+        <div
+          className="sidebar-section-title"
+          onClick={() => onToggle(entry.slug)}
+        >
           <span>{entry.title}</span>
-          <span className={`chevron ${!isCollapsed ? 'open' : ''}`}>▶</span>
+          <span className={`chevron ${!isCollapsed ? "open" : ""}`}>▶</span>
         </div>
         {!isCollapsed &&
           entry.children.map((child) => (
@@ -106,13 +119,13 @@ function SidebarItem({ entry, currentPath, collapsed, onToggle, onNavigate, dept
   }
 
   const route = docPathToRoute(entry.path);
-  const isActive = currentPath === route || currentPath === route + '/';
-  const nestClass = depth > 0 ? (depth > 1 ? 'nested-2' : 'nested') : '';
+  const isActive = currentPath === route || currentPath === route + "/";
+  const nestClass = depth > 0 ? (depth > 1 ? "nested-2" : "nested") : "";
 
   return (
     <Link
       to={route}
-      className={`sidebar-link ${nestClass} ${isActive ? 'active' : ''}`}
+      className={`sidebar-link ${nestClass} ${isActive ? "active" : ""}`}
       onClick={onNavigate}
     >
       {entry.title}

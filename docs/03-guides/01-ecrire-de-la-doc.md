@@ -54,12 +54,12 @@ order: 1
 
 Les blocs de code avec le langage spécifié bénéficient de la coloration syntaxique :
 
-~~~markdown
+````markdown
 ```python
 def hello():
     print("Bonjour le monde !")
 ```
-~~~
+````
 
 ### 4. Utilisez les liens internes
 
@@ -73,11 +73,11 @@ Voir la [page d'installation](/getting-started/installation).
 
 Chaque page peut être téléchargée dans les formats suivants :
 
-| Format | Extension | Description |
-|---|---|---|
-| Markdown | `.md` | Fichier source brut |
-| HTML | `.html` | Page web autonome |
-| PDF | `.pdf` | Document imprimable |
-| Texte | `.txt` | Texte brut sans formatage |
+| Format   | Extension | Description               |
+| -------- | --------- | ------------------------- |
+| Markdown | `.md`     | Fichier source brut       |
+| HTML     | `.html`   | Page web autonome         |
+| PDF      | `.pdf`    | Document imprimable       |
+| Texte    | `.txt`    | Texte brut sans formatage |
 
 Vous pouvez également télécharger **toute la documentation** dans un fichier ZIP.

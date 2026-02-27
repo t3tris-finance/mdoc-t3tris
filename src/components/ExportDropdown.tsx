@@ -1,12 +1,12 @@
-import { useState, useRef } from 'react';
-import type { DocEntry } from '../utils/docs';
+import { useState, useRef } from "react";
+import type { DocEntry } from "../utils/docs";
 import {
   exportAsMarkdown,
   exportAsHTML,
   exportAsPDF,
   exportAsText,
   exportAllAsZip,
-} from '../utils/export';
+} from "../utils/export";
 
 interface ExportDropdownProps {
   docPath: string;
@@ -15,7 +15,12 @@ interface ExportDropdownProps {
   allEntries: DocEntry[];
 }
 
-export default function ExportDropdown({ docPath, title, contentRef, allEntries }: ExportDropdownProps) {
+export default function ExportDropdown({
+  docPath,
+  title,
+  contentRef,
+  allEntries,
+}: ExportDropdownProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -25,7 +30,7 @@ export default function ExportDropdown({ docPath, title, contentRef, allEntries 
     try {
       await fn();
     } catch (err) {
-      console.error('Export failed:', err);
+      console.error("Export failed:", err);
     } finally {
       setLoading(false);
       setOpen(false);
@@ -34,24 +39,22 @@ export default function ExportDropdown({ docPath, title, contentRef, allEntries 
 
   return (
     <div className="export-dropdown" ref={dropdownRef}>
-      <button
-        className="btn"
-        onClick={() => setOpen(!open)}
-        disabled={loading}
-      >
-        {loading ? '⏳' : '📥'} Exporter
+      <button className="btn" onClick={() => setOpen(!open)} disabled={loading}>
+        {loading ? "⏳" : "📥"} Exporter
       </button>
       {open && (
         <>
           <div
-            style={{ position: 'fixed', inset: 0, zIndex: 199 }}
+            style={{ position: "fixed", inset: 0, zIndex: 199 }}
             onClick={() => setOpen(false)}
           />
           <div className="export-menu">
             <div className="export-menu-title">Cette page</div>
             <button
               className="export-menu-item"
-              onClick={() => handleExport(() => exportAsMarkdown(docPath, title))}
+              onClick={() =>
+                handleExport(() => exportAsMarkdown(docPath, title))
+              }
             >
               📝 Markdown (.md)
             </button>
@@ -83,19 +86,25 @@ export default function ExportDropdown({ docPath, title, contentRef, allEntries 
             <div className="export-menu-title">Toute la documentation</div>
             <button
               className="export-menu-item"
-              onClick={() => handleExport(() => exportAllAsZip(allEntries, 'md'))}
+              onClick={() =>
+                handleExport(() => exportAllAsZip(allEntries, "md"))
+              }
             >
               📦 Tout en Markdown (.zip)
             </button>
             <button
               className="export-menu-item"
-              onClick={() => handleExport(() => exportAllAsZip(allEntries, 'html'))}
+              onClick={() =>
+                handleExport(() => exportAllAsZip(allEntries, "html"))
+              }
             >
               📦 Tout en HTML (.zip)
             </button>
             <button
               className="export-menu-item"
-              onClick={() => handleExport(() => exportAllAsZip(allEntries, 'txt'))}
+              onClick={() =>
+                handleExport(() => exportAllAsZip(allEntries, "txt"))
+              }
             >
               📦 Tout en Texte (.zip)
             </button>

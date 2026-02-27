@@ -1,12 +1,12 @@
-import { useState, useEffect, useMemo } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Sidebar from './components/Sidebar';
-import ThemeToggle from './components/ThemeToggle';
-import DocRenderer from './components/DocRenderer';
-import HomePage from './pages/HomePage';
-import { useTheme } from './hooks/useTheme';
-import { fetchManifest, flattenEntries, docPathToRoute } from './utils/docs';
-import type { DocEntry } from './utils/docs';
+import { useState, useEffect, useMemo } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Sidebar from "./components/Sidebar";
+import ThemeToggle from "./components/ThemeToggle";
+import DocRenderer from "./components/DocRenderer";
+import HomePage from "./pages/HomePage";
+import { useTheme } from "./hooks/useTheme";
+import { fetchManifest, flattenEntries, docPathToRoute } from "./utils/docs";
+import type { DocEntry } from "./utils/docs";
 
 export default function App() {
   const { theme, toggleTheme } = useTheme();
@@ -17,7 +17,7 @@ export default function App() {
   useEffect(() => {
     fetchManifest()
       .then(setEntries)
-      .catch((err) => console.error('Failed to load manifest:', err))
+      .catch((err) => console.error("Failed to load manifest:", err))
       .finally(() => setLoading(false));
   }, []);
 
@@ -31,7 +31,7 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="loading" style={{ height: '100vh' }}>
+      <div className="loading" style={{ height: "100vh" }}>
         <div className="loading-spinner" />
         Chargement de la documentation...
       </div>
@@ -48,9 +48,13 @@ export default function App() {
               onClick={() => setSidebarOpen(!sidebarOpen)}
               aria-label="Toggle menu"
             >
-              {sidebarOpen ? '✕' : '☰'}
+              {sidebarOpen ? "✕" : "☰"}
             </button>
-            <a href="/" className="header-logo" style={{ textDecoration: 'none' }}>
+            <a
+              href="/"
+              className="header-logo"
+              style={{ textDecoration: "none" }}
+            >
               m<span>Doc</span>
             </a>
           </div>

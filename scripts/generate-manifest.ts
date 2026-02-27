@@ -2,7 +2,13 @@
  * Scans the docs/ folder and generates a JSON manifest of all .md files.
  * Run with: bun scripts/generate-manifest.ts
  */
-import { readdirSync, statSync, writeFileSync, existsSync, mkdirSync } from "fs";
+import {
+  readdirSync,
+  statSync,
+  writeFileSync,
+  existsSync,
+  mkdirSync,
+} from "fs";
 import { join, basename, extname } from "path";
 import matter from "gray-matter";
 import { readFileSync } from "fs";
@@ -89,6 +95,11 @@ const manifest = scanDir(docsDir, "/docs");
 const outDir = join(process.cwd(), "public");
 if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
 
-writeFileSync(join(outDir, "docs-manifest.json"), JSON.stringify(manifest, null, 2));
+writeFileSync(
+  join(outDir, "docs-manifest.json"),
+  JSON.stringify(manifest, null, 2),
+);
 console.log("✅ docs-manifest.json generated successfully!");
-console.log(`   Found ${JSON.stringify(manifest, null, 2).split('"path"').length - 1} document(s)`);
+console.log(
+  `   Found ${JSON.stringify(manifest, null, 2).split('"path"').length - 1} document(s)`,
+);

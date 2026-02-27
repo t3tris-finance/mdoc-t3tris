@@ -7,8 +7,8 @@ export interface DocEntry {
 }
 
 export async function fetchManifest(): Promise<DocEntry[]> {
-  const res = await fetch('/docs-manifest.json');
-  if (!res.ok) throw new Error('Failed to load docs manifest');
+  const res = await fetch("/docs-manifest.json");
+  if (!res.ok) throw new Error("Failed to load docs manifest");
   return res.json();
 }
 
@@ -21,7 +21,9 @@ export async function fetchMarkdown(path: string): Promise<string> {
 /**
  * Build a flat list of all pages from the manifest tree
  */
-export function flattenEntries(entries: DocEntry[]): { title: string; path: string; breadcrumb: string[] }[] {
+export function flattenEntries(
+  entries: DocEntry[],
+): { title: string; path: string; breadcrumb: string[] }[] {
   const result: { title: string; path: string; breadcrumb: string[] }[] = [];
 
   for (const entry of entries) {
@@ -52,17 +54,20 @@ export function flattenEntries(entries: DocEntry[]): { title: string; path: stri
  */
 export function docPathToRoute(docPath: string): string {
   return docPath
-    .replace(/^\/docs/, '')
-    .replace(/\.md$/, '')
-    .replace(/\/index$/, '')
-    .replace(/\/\d+-/g, '/')
-    .replace(/^\/?/, '/');
+    .replace(/^\/docs/, "")
+    .replace(/\.md$/, "")
+    .replace(/\/index$/, "")
+    .replace(/\/\d+-/g, "/")
+    .replace(/^\/?/, "/");
 }
 
 /**
  * Find a doc entry by route path
  */
-export function findEntryByRoute(entries: DocEntry[], route: string): { title: string; path: string; breadcrumb: string[] } | undefined {
+export function findEntryByRoute(
+  entries: DocEntry[],
+  route: string,
+): { title: string; path: string; breadcrumb: string[] } | undefined {
   const flat = flattenEntries(entries);
   return flat.find((entry) => docPathToRoute(entry.path) === route);
 }

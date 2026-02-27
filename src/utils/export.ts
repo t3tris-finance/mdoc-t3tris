@@ -1,16 +1,16 @@
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
-import JSZip from 'jszip';
-import { saveAs } from 'file-saver';
-import type { DocEntry } from './docs';
-import { flattenEntries, fetchMarkdown } from './docs';
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
+import type { DocEntry } from "./docs";
+import { flattenEntries, fetchMarkdown } from "./docs";
 
 /**
  * Strip frontmatter from raw markdown
  */
 function stripFrontmatter(md: string): string {
-  if (md.startsWith('---')) {
-    const end = md.indexOf('---', 3);
+  if (md.startsWith("---")) {
+    const end = md.indexOf("---", 3);
     if (end !== -1) {
       return md.slice(end + 3).trim();
     }
@@ -32,7 +32,11 @@ function downloadFile(content: string, filename: string, mimeType: string) {
 export async function exportAsMarkdown(docPath: string, title: string) {
   const md = await fetchMarkdown(docPath);
   const clean = stripFrontmatter(md);
-  downloadFile(clean, `${title.toLowerCase().replace(/\s+/g, '-')}.md`, 'text/markdown');
+  downloadFile(
+    clean,
+    `${title.toLowerCase().replace(/\s+/g, "-")}.md`,
+    "text/markdown",
+  );
 }
 
 /**
@@ -63,11 +67,15 @@ export async function exportAsHTML(docPath: string, title: string) {
 <body>
   <article>
     <h1>${title}</h1>
-    <pre style="white-space: pre-wrap;">${clean.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+    <pre style="white-space: pre-wrap;">${clean.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</pre>
   </article>
 </body>
 </html>`;
-  downloadFile(html, `${title.toLowerCase().replace(/\s+/g, '-')}.html`, 'text/html');
+  downloadFile(
+    html,
+    `${title.toLowerCase().replace(/\s+/g, "-")}.html`,
+    "text/html",
+  );
 }
 
 /**
@@ -77,11 +85,11 @@ export async function exportAsPDF(contentElement: HTMLElement, title: string) {
   const canvas = await html2canvas(contentElement, {
     scale: 2,
     useCORS: true,
-    backgroundColor: '#ffffff',
+    backgroundColor: "#ffffff",
   });
 
-  const imgData = canvas.toDataURL('image/png');
-  const pdf = new jsPDF('p', 'mm', 'a4');
+  const imgData = canvas.toDataURL("image/png");
+  const pdf = new jsPDF("p", "mm", "a4");
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   const imgWidth = pageWidth - 20;
@@ -90,17 +98,17 @@ export async function exportAsPDF(contentElement: HTMLElement, title: string) {
   let heightLeft = imgHeight;
   let position = 10;
 
-  pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+  pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
   heightLeft -= pageHeight;
 
   while (heightLeft > 0) {
     position = heightLeft - imgHeight + 10;
     pdf.addPage();
-    pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+    pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
     heightLeft -= pageHeight;
   }
 
-  pdf.save(`${title.toLowerCase().replace(/\s+/g, '-')}.pdf`);
+  pdf.save(`${title.toLowerCase().replace(/\s+/g, "-")}.pdf`);
 }
 
 /**
@@ -111,48 +119,58 @@ export async function exportAsText(docPath: string, title: string) {
   const clean = stripFrontmatter(md);
   // Simple markdown-to-text stripping
   const text = clean
-    .replace(/#{1,6}\s/g, '')
-    .replace(/\*\*(.*?)\*\*/g, '$1')
-    .replace(/\*(.*?)\*/g, '$1')
-    .replace(/`{1,3}[^`]*`{1,3}/g, (m) => m.replace(/`/g, ''))
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-    .replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1');
-  downloadFile(text, `${title.toLowerCase().replace(/\s+/g, '-')}.txt`, 'text/plain');
+    .replace(/#{1,6}\s/g, "")
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/\*(.*?)\*/g, "$1")
+    .replace(/`{1,3}[^`]*`{1,3}/g, (m) => m.replace(/`/g, ""))
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1");
+  downloadFile(
+    text,
+    `${title.toLowerCase().replace(/\s+/g, "-")}.txt`,
+    "text/plain",
+  );
 }
 
 /**
  * Export ALL doc pages as a ZIP of markdown files
  */
-export async function exportAllAsZip(entries: DocEntry[], format: 'md' | 'html' | 'txt' = 'md') {
+export async function exportAllAsZip(
+  entries: DocEntry[],
+  format: "md" | "html" | "txt" = "md",
+) {
   const zip = new JSZip();
   const flat = flattenEntries(entries);
 
   for (const entry of flat) {
     const md = await fetchMarkdown(entry.path);
     const clean = stripFrontmatter(md);
-    const filename = entry.title.toLowerCase().replace(/\s+/g, '-');
+    const filename = entry.title.toLowerCase().replace(/\s+/g, "-");
 
-    const folderPath = entry.breadcrumb.length > 0
-      ? entry.breadcrumb.map(b => b.toLowerCase().replace(/\s+/g, '-')).join('/') + '/'
-      : '';
+    const folderPath =
+      entry.breadcrumb.length > 0
+        ? entry.breadcrumb
+            .map((b) => b.toLowerCase().replace(/\s+/g, "-"))
+            .join("/") + "/"
+        : "";
 
-    if (format === 'md') {
+    if (format === "md") {
       zip.file(`${folderPath}${filename}.md`, clean);
-    } else if (format === 'html') {
+    } else if (format === "html") {
       const html = `<!DOCTYPE html>
 <html><head><meta charset="UTF-8"><title>${entry.title}</title>
 <style>body{font-family:sans-serif;max-width:800px;margin:2rem auto;padding:0 1rem;line-height:1.6;}</style>
-</head><body><h1>${entry.title}</h1><pre style="white-space:pre-wrap;">${clean.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre></body></html>`;
+</head><body><h1>${entry.title}</h1><pre style="white-space:pre-wrap;">${clean.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</pre></body></html>`;
       zip.file(`${folderPath}${filename}.html`, html);
     } else {
       const text = clean
-        .replace(/#{1,6}\s/g, '')
-        .replace(/\*\*(.*?)\*\*/g, '$1')
-        .replace(/\*(.*?)\*/g, '$1');
+        .replace(/#{1,6}\s/g, "")
+        .replace(/\*\*(.*?)\*\*/g, "$1")
+        .replace(/\*(.*?)\*/g, "$1");
       zip.file(`${folderPath}${filename}.txt`, text);
     }
   }
 
-  const blob = await zip.generateAsync({ type: 'blob' });
+  const blob = await zip.generateAsync({ type: "blob" });
   saveAs(blob, `documentation-${format}.zip`);
 }

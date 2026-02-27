@@ -18,10 +18,10 @@ order: 1
 
 ### Propriétés disponibles
 
-| Propriété | Type | Description |
-|---|---|---|
-| `title` | `string` | Titre affiché dans la sidebar et le fil d'Ariane |
-| `order` | `number` | Ordre d'affichage dans la navigation |
+| Propriété | Type     | Description                                      |
+| --------- | -------- | ------------------------------------------------ |
+| `title`   | `string` | Titre affiché dans la sidebar et le fil d'Ariane |
+| `order`   | `number` | Ordre d'affichage dans la navigation             |
 
 ## Nommage des fichiers
 

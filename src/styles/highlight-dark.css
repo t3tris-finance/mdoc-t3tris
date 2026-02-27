@@ -1,7 +1,7 @@
 /* highlight.js theme overrides for dark mode */
 [data-theme="dark"] .hljs {
-  background: var(--bg-code) !important;
-  color: #e6edf3 !important;
+    background: var(--bg-code) !important;
+    color: #e6edf3 !important;
 }
 
 [data-theme="dark"] .hljs-keyword,
@@ -9,7 +9,7 @@
 [data-theme="dark"] .hljs-literal,
 [data-theme="dark"] .hljs-section,
 [data-theme="dark"] .hljs-link {
-  color: #ff7b72;
+    color: #ff7b72;
 }
 
 [data-theme="dark"] .hljs-string,
@@ -23,14 +23,14 @@
 [data-theme="dark"] .hljs-variable,
 [data-theme="dark"] .hljs-template-tag,
 [data-theme="dark"] .hljs-template-variable {
-  color: #a5d6ff;
+    color: #a5d6ff;
 }
 
 [data-theme="dark"] .hljs-comment,
 [data-theme="dark"] .hljs-quote,
 [data-theme="dark"] .hljs-deletion,
 [data-theme="dark"] .hljs-meta {
-  color: #8b949e;
+    color: #8b949e;
 }
 
 [data-theme="dark"] .hljs-keyword,
@@ -42,17 +42,17 @@
 [data-theme="dark"] .hljs-type,
 [data-theme="dark"] .hljs-name,
 [data-theme="dark"] .hljs-strong {
-  font-weight: normal;
+    font-weight: normal;
 }
 
 [data-theme="dark"] .hljs-number {
-  color: #79c0ff;
+    color: #79c0ff;
 }
 
 [data-theme="dark"] .hljs-built_in {
-  color: #d2a8ff;
+    color: #d2a8ff;
 }
 
 [data-theme="dark"] .hljs-function .hljs-keyword {
-  color: #ff7b72;
+    color: #ff7b72;
 }
