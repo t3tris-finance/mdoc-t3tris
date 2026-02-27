@@ -16,7 +16,11 @@ interface HeadingProps {
   id?: string;
 }
 
-export default function HeadingWithAnchor({ level, children, id }: HeadingProps) {
+export default function HeadingWithAnchor({
+  level,
+  children,
+  id,
+}: HeadingProps) {
   const Tag = `h${level}` as keyof JSX.IntrinsicElements;
   const slug = id || "";
 

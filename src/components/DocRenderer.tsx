@@ -18,12 +18,36 @@ interface DocRendererProps {
 }
 
 const markdownComponents: Partial<Components> = {
-  h1: ({ children, id }) => <HeadingWithAnchor level={1} id={id}>{children}</HeadingWithAnchor>,
-  h2: ({ children, id }) => <HeadingWithAnchor level={2} id={id}>{children}</HeadingWithAnchor>,
-  h3: ({ children, id }) => <HeadingWithAnchor level={3} id={id}>{children}</HeadingWithAnchor>,
-  h4: ({ children, id }) => <HeadingWithAnchor level={4} id={id}>{children}</HeadingWithAnchor>,
-  h5: ({ children, id }) => <HeadingWithAnchor level={5} id={id}>{children}</HeadingWithAnchor>,
-  h6: ({ children, id }) => <HeadingWithAnchor level={6} id={id}>{children}</HeadingWithAnchor>,
+  h1: ({ children, id }) => (
+    <HeadingWithAnchor level={1} id={id}>
+      {children}
+    </HeadingWithAnchor>
+  ),
+  h2: ({ children, id }) => (
+    <HeadingWithAnchor level={2} id={id}>
+      {children}
+    </HeadingWithAnchor>
+  ),
+  h3: ({ children, id }) => (
+    <HeadingWithAnchor level={3} id={id}>
+      {children}
+    </HeadingWithAnchor>
+  ),
+  h4: ({ children, id }) => (
+    <HeadingWithAnchor level={4} id={id}>
+      {children}
+    </HeadingWithAnchor>
+  ),
+  h5: ({ children, id }) => (
+    <HeadingWithAnchor level={5} id={id}>
+      {children}
+    </HeadingWithAnchor>
+  ),
+  h6: ({ children, id }) => (
+    <HeadingWithAnchor level={6} id={id}>
+      {children}
+    </HeadingWithAnchor>
+  ),
 };
 
 type DocState =
