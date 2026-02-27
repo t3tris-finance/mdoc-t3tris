@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -58,7 +58,6 @@ type DocState =
 export default function DocRenderer({ entries }: DocRendererProps) {
   const location = useLocation();
   const [state, setState] = useState<DocState>({ status: "loading" });
-  const contentRef = useRef<HTMLDivElement>(null);
 
   const currentEntry = useMemo(
     () => findEntryByRoute(entries, location.pathname),
@@ -155,14 +154,13 @@ export default function DocRenderer({ entries }: DocRendererProps) {
         <ExportDropdown
           docPath={currentEntry.path}
           title={currentEntry.title}
-          contentRef={contentRef}
           allEntries={entries}
         />
         <button className="btn" onClick={handleShare}>
           🔗 Partager
         </button>
       </div>
-      <div className="markdown-body" ref={contentRef}>
+      <div className="markdown-body">
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkFrontmatter]}
           rehypePlugins={[rehypeHighlight, rehypeSlug, rehypeRaw]}

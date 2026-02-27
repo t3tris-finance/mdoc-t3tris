@@ -11,14 +11,12 @@ import {
 interface ExportDropdownProps {
   docPath: string;
   title: string;
-  contentRef: React.RefObject<HTMLDivElement | null>;
   allEntries: DocEntry[];
 }
 
 export default function ExportDropdown({
   docPath,
   title,
-  contentRef,
   allEntries,
 }: ExportDropdownProps) {
   const [open, setOpen] = useState(false);
@@ -67,11 +65,7 @@ export default function ExportDropdown({
             <button
               className="export-menu-item"
               onClick={() =>
-                handleExport(async () => {
-                  if (contentRef.current) {
-                    await exportAsPDF(contentRef.current, title);
-                  }
-                })
+                handleExport(() => exportAsPDF(docPath, title))
               }
             >
               📄 PDF (.pdf)
