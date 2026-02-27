@@ -1,0 +1,135 @@
+import { useEffect, useState, useRef, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkFrontmatter from 'remark-frontmatter';
+import rehypeHighlight from 'rehype-highlight';
+import rehypeSlug from 'rehype-slug';
+import rehypeRaw from 'rehype-raw';
+import type { DocEntry } from '../utils/docs';
+import { fetchMarkdown, findEntryByRoute } from '../utils/docs';
+import Breadcrumb from './Breadcrumb';
+import ExportDropdown from './ExportDropdown';
+
+interface DocRendererProps {
+  entries: DocEntry[];
+}
+
+type DocState =
+  | { status: 'loading' }
+  | { status: 'error' }
+  | { status: 'ready'; content: string };
+
+export default function DocRenderer({ entries }: DocRendererProps) {
+  const location = useLocation();
+  const [state, setState] = useState<DocState>({ status: 'loading' });
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const currentEntry = useMemo(
+    () => findEntryByRoute(entries, location.pathname),
+    [entries, location.pathname]
+  );
+
+  useEffect(() => {
+    if (!currentEntry) return;
+
+    let cancelled = false;
+    setState({ status: 'loading' });
+
+    fetchMarkdown(currentEntry.path)
+      .then((md) => {
+        if (cancelled) return;
+        let clean = md;
+        if (md.startsWith('---')) {
+          const end = md.indexOf('---', 3);
+          if (end !== -1) clean = md.slice(end + 3).trim();
+        }
+        setState({ status: 'ready', content: clean });
+      })
+      .catch(() => {
+        if (!cancelled) setState({ status: 'error' });
+      });
+
+    return () => { cancelled = true; };
+  }, [currentEntry]);
+
+  // Scroll to heading if hash
+  useEffect(() => {
+    if (state.status !== 'ready') return;
+    if (location.hash) {
+      const el = document.querySelector(location.hash);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [state, location.hash]);
+
+  if (!currentEntry) {
+    return (
+      <div className="not-found">
+        <h1>404</h1>
+        <p>Page non trouvée</p>
+        <a href="/">← Retour à l'accueil</a>
+      </div>
+    );
+  }
+
+  if (state.status === 'loading') {
+    return (
+      <div className="loading">
+        <div className="loading-spinner" />
+        Chargement...
+      </div>
+    );
+  }
+
+  if (state.status === 'error') {
+    return (
+      <div className="not-found">
+        <h1>Erreur</h1>
+        <p>Impossible de charger cette page</p>
+        <a href="/">← Retour à l'accueil</a>
+      </div>
+    );
+  }
+
+  const content = state.content;
+  const shareUrl = window.location.href;
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      await navigator.share({
+        title: currentEntry.title,
+        url: shareUrl,
+      });
+    } else {
+      await navigator.clipboard.writeText(shareUrl);
+      alert('Lien copié dans le presse-papiers !');
+    }
+  };
+
+  return (
+    <div>
+      <Breadcrumb items={currentEntry.breadcrumb} current={currentEntry.title} />
+      <div className="page-actions">
+        <ExportDropdown
+          docPath={currentEntry.path}
+          title={currentEntry.title}
+          contentRef={contentRef}
+          allEntries={entries}
+        />
+        <button className="btn" onClick={handleShare}>
+          🔗 Partager
+        </button>
+      </div>
+      <div className="markdown-body" ref={contentRef}>
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm, remarkFrontmatter]}
+          rehypePlugins={[rehypeHighlight, rehypeSlug, rehypeRaw]}
+        >
+          {content}
+        </ReactMarkdown>
+      </div>
+    </div>
+  );
+}
