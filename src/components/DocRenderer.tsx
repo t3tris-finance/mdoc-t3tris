@@ -104,8 +104,8 @@ export default function DocRenderer({ entries }: DocRendererProps) {
     return (
       <div className="not-found">
         <h1>404</h1>
-        <p>Page non trouvée</p>
-        <a href="/">← Retour à l'accueil</a>
+        <p>Page not found</p>
+        <a href="/">← Back to home</a>
       </div>
     );
   }
@@ -114,7 +114,7 @@ export default function DocRenderer({ entries }: DocRendererProps) {
     return (
       <div className="loading">
         <div className="loading-spinner" />
-        Chargement...
+        Loading...
       </div>
     );
   }
@@ -122,9 +122,9 @@ export default function DocRenderer({ entries }: DocRendererProps) {
   if (state.status === "error") {
     return (
       <div className="not-found">
-        <h1>Erreur</h1>
-        <p>Impossible de charger cette page</p>
-        <a href="/">← Retour à l'accueil</a>
+        <h1>Error</h1>
+        <p>Unable to load this page</p>
+        <a href="/">← Back to home</a>
       </div>
     );
   }
@@ -140,7 +140,7 @@ export default function DocRenderer({ entries }: DocRendererProps) {
       });
     } else {
       await navigator.clipboard.writeText(shareUrl);
-      alert("Lien copié dans le presse-papiers !");
+      alert("Link copied to clipboard!");
     }
   };
 
@@ -157,7 +157,7 @@ export default function DocRenderer({ entries }: DocRendererProps) {
           allEntries={entries}
         />
         <button className="btn" onClick={handleShare}>
-          🔗 Partager
+          🔗 Share
         </button>
       </div>
       <div className="markdown-body">

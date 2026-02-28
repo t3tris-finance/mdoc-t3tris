@@ -15,9 +15,8 @@ export default function HomePage({ entries }: HomePageProps) {
       <div className="markdown-body">
         <h1>📚 Documentation</h1>
         <p>
-          Bienvenue dans la documentation. Utilisez la barre latérale pour
-          naviguer entre les différentes sections, ou explorez les pages
-          ci-dessous.
+          Welcome to the documentation. Use the sidebar to navigate between
+          sections, or explore the pages below.
         </p>
 
         {entries.map((section) => (
@@ -48,10 +47,10 @@ export default function HomePage({ entries }: HomePageProps) {
             }}
           >
             <p style={{ fontSize: "3rem", marginBottom: "1rem" }}>📂</p>
-            <p>Aucune documentation trouvée.</p>
+            <p>No documentation found.</p>
             <p style={{ fontSize: "0.875rem", marginTop: "0.5rem" }}>
-              Ajoutez des fichiers <code>.md</code> dans le dossier{" "}
-              <code>docs/</code> pour commencer.
+              Add <code>.md</code> files to the <code>docs/</code> folder to get
+              started.
             </p>
           </div>
         )}

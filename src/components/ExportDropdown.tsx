@@ -38,7 +38,7 @@ export default function ExportDropdown({
   return (
     <div className="export-dropdown" ref={dropdownRef}>
       <button className="btn" onClick={() => setOpen(!open)} disabled={loading}>
-        {loading ? "⏳" : "📥"} Exporter
+        {loading ? "⏳" : "📥"} Export
       </button>
       {open && (
         <>
@@ -47,7 +47,7 @@ export default function ExportDropdown({
             onClick={() => setOpen(false)}
           />
           <div className="export-menu">
-            <div className="export-menu-title">Cette page</div>
+            <div className="export-menu-title">This page</div>
             <button
               className="export-menu-item"
               onClick={() =>
@@ -72,17 +72,17 @@ export default function ExportDropdown({
               className="export-menu-item"
               onClick={() => handleExport(() => exportAsText(docPath, title))}
             >
-              📃 Texte brut (.txt)
+              📃 Plain text (.txt)
             </button>
             <div className="export-menu-divider" />
-            <div className="export-menu-title">Toute la documentation</div>
+            <div className="export-menu-title">All documentation</div>
             <button
               className="export-menu-item"
               onClick={() =>
                 handleExport(() => exportAllAsZip(allEntries, "md"))
               }
             >
-              📦 Tout en Markdown (.zip)
+              📦 All as Markdown (.zip)
             </button>
             <button
               className="export-menu-item"
@@ -90,7 +90,7 @@ export default function ExportDropdown({
                 handleExport(() => exportAllAsZip(allEntries, "html"))
               }
             >
-              📦 Tout en HTML (.zip)
+              📦 All as HTML (.zip)
             </button>
             <button
               className="export-menu-item"
@@ -98,7 +98,7 @@ export default function ExportDropdown({
                 handleExport(() => exportAllAsZip(allEntries, "txt"))
               }
             >
-              📦 Tout en Texte (.zip)
+              📦 All as Text (.zip)
             </button>
           </div>
         </>

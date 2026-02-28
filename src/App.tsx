@@ -33,7 +33,7 @@ export default function App() {
     return (
       <div className="loading" style={{ height: "100vh" }}>
         <div className="loading-spinner" />
-        Chargement de la documentation...
+        Loading documentation...
       </div>
     );
   }

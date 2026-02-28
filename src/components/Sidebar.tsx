@@ -50,7 +50,7 @@ export default function Sidebar({ entries, isOpen, onClose }: SidebarProps) {
           <span className="search-icon">🔍</span>
           <input
             type="text"
-            placeholder="Rechercher..."
+            placeholder="Search..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />

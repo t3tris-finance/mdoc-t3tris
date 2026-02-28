@@ -42,11 +42,11 @@ export default function HeadingWithAnchor({
           href={`#${slug}`}
           className="heading-anchor"
           onClick={handleCopyLink}
-          aria-label={`Lien vers la section "${getTextContent(children)}"`}
-          title="Copier le lien vers cette section"
+          aria-label={`Link to section "${getTextContent(children)}"`}
+          title="Copy link to this section"
         >
           <span className="anchor-icon">#</span>
-          <span className="anchor-copied-label">Copié !</span>
+          <span className="anchor-copied-label">Copied!</span>
         </a>
       )}
     </Tag>

@@ -8,7 +8,7 @@ interface BreadcrumbProps {
 export default function Breadcrumb({ items, current }: BreadcrumbProps) {
   return (
     <div className="breadcrumb">
-      <Link to="/">🏠 Accueil</Link>
+      <Link to="/">🏠 Home</Link>
       {items.map((item, i) => (
         <span key={i}>
           <span className="separator"> › </span>
