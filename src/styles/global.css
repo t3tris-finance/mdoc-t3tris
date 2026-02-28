@@ -490,12 +490,6 @@ a:hover {
     text-decoration: none;
 }
 
-/* Highlight.js overrides */
-.markdown-body pre .hljs {
-    background: transparent;
-    color: var(--text-primary);
-}
-
 /* Buttons */
 .btn {
     display: inline-flex;

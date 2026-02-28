@@ -3,12 +3,9 @@ import { useLocation } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkFrontmatter from "remark-frontmatter";
-import rehypeHighlight from "rehype-highlight";
+import rehypeShiki from "@shikijs/rehype";
 import rehypeSlug from "rehype-slug";
 import rehypeRaw from "rehype-raw";
-import { all } from "lowlight";
-// @ts-expect-error – highlightjs-solidity has no types
-import { solidity, yul } from "highlightjs-solidity";
 import type { DocEntry } from "../utils/docs";
 import { fetchMarkdown, findEntryByRoute } from "../utils/docs";
 import Breadcrumb from "./Breadcrumb";
@@ -169,7 +166,16 @@ export default function DocRenderer({ entries }: DocRendererProps) {
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkFrontmatter]}
           rehypePlugins={[
-            [rehypeHighlight, { languages: { ...all, solidity, yul } }],
+            [
+              rehypeShiki,
+              {
+                themes: {
+                  light: "github-light",
+                  dark: "github-dark",
+                },
+                defaultColor: false,
+              },
+            ],
             rehypeSlug,
             rehypeRaw,
           ]}

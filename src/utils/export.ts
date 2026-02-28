@@ -26,6 +26,46 @@ function downloadFile(content: string, filename: string, mimeType: string) {
   saveAs(blob, filename);
 }
 
+// ─── Unicode → ASCII fallback for PDF (jsPDF built-in fonts are WinAnsi only) ─
+const UNICODE_TO_ASCII: [RegExp, string][] = [
+  // Box-drawing corners & junctions
+  [/[┌┐└┘]/g, "+"],
+  [/[├┤┬┴┼]/g, "+"],
+  // Box-drawing lines
+  [/[─━]/g, "-"],
+  [/[│┃]/g, "|"],
+  // Double-line box-drawing
+  [/[╔╗╚╝╠╣╦╩╬]/g, "+"],
+  [/[═]/g, "="],
+  [/[║]/g, "|"],
+  // Arrows
+  [/[▶►→➜➤]/g, ">"],
+  [/[◀◄←]/g, "<"],
+  [/[▼▾↓]/g, "v"],
+  [/[▲▴↑]/g, "^"],
+  // Bullets / markers
+  [/[•●○◦◉◎]/g, "*"],
+  [/[■□▪▫]/g, "#"],
+  [/[✓✔☑]/g, "[x]"],
+  [/[✗✘☐]/g, "[ ]"],
+  // Misc
+  [/[…]/g, "..."],
+  [/[–]/g, "--"],
+  [/[—]/g, "---"],
+  [/[≥]/g, ">="],
+  [/[≤]/g, "<="],
+  [/[≠]/g, "!="],
+];
+
+/** Replace Unicode characters unsupported by jsPDF built-in fonts */
+function sanitizeForPdf(text: string): string {
+  let result = text;
+  for (const [pattern, replacement] of UNICODE_TO_ASCII) {
+    result = result.replace(pattern, replacement);
+  }
+  return result;
+}
+
 // ─── PDF rendering constants ────────────────────────────────────────────────
 const MARGIN = 15; // mm
 const LINE_HEIGHT = 1.5;
@@ -139,7 +179,7 @@ class PdfRenderer {
   // ─── Token renderers ──────────────────────────────────────────────────
 
   private renderHeading(token: Tokens.Heading) {
-    const text = this.inlineTokensToText(token.tokens);
+    const text = sanitizeForPdf(this.inlineTokensToText(token.tokens));
     const key = `h${token.depth}` as keyof typeof FONT_SIZES;
     const fontSize = FONT_SIZES[key] ?? FONT_SIZES.body;
     const lines = this.wrapText(text, fontSize, "bold");
@@ -158,14 +198,14 @@ class PdfRenderer {
   }
 
   private renderParagraph(token: Tokens.Paragraph) {
-    const text = this.inlineTokensToText(token.tokens);
+    const text = sanitizeForPdf(this.inlineTokensToText(token.tokens));
     const lines = this.wrapText(text, FONT_SIZES.body);
     this.writeLines(lines, FONT_SIZES.body);
     this.addSpace(3);
   }
 
   private renderCode(token: Tokens.Code) {
-    const codeLines = token.text.split("\n");
+    const codeLines = sanitizeForPdf(token.text).split("\n");
     const lineH = (FONT_SIZES.code * LINE_HEIGHT * 25.4) / 72;
     const padding = 3;
     const blockHeight = codeLines.length * lineH + padding * 2;
@@ -208,7 +248,7 @@ class PdfRenderer {
   }
 
   private renderBlockquote(token: Tokens.Blockquote) {
-    const text = token.tokens
+    const text = sanitizeForPdf(token.tokens
       .map((t) =>
         "tokens" in t && t.tokens
           ? this.inlineTokensToText(t.tokens)
@@ -216,7 +256,7 @@ class PdfRenderer {
             ? (t as Tokens.Text).text
             : "",
       )
-      .join(" ");
+      .join(" "));
 
     const lines = this.wrapText(text, FONT_SIZES.body, "italic");
     const lineH = (FONT_SIZES.body * LINE_HEIGHT * 25.4) / 72;
@@ -251,8 +291,8 @@ class PdfRenderer {
     const indentMm = indent * 5;
 
     token.items.forEach((item, idx) => {
-      const bullet = token.ordered ? `${idx + 1}.` : "•";
-      const text = item.tokens
+      const bullet = token.ordered ? `${idx + 1}.` : "-";
+      const text = sanitizeForPdf(item.tokens
         .filter(
           (t): t is Tokens.Paragraph | Tokens.Text =>
             t.type === "text" || t.type === "paragraph",
@@ -262,7 +302,7 @@ class PdfRenderer {
             ? this.inlineTokensToText(t.tokens)
             : (t as Tokens.Text).text,
         )
-        .join(" ");
+        .join(" "));
 
       const lines = this.pdf.splitTextToSize(
         text,
@@ -328,7 +368,7 @@ class PdfRenderer {
     this.pdf.setTextColor(...COLORS.text);
 
     token.header.forEach((cell, i) => {
-      const text = this.inlineTokensToText(cell.tokens);
+      const text = sanitizeForPdf(this.inlineTokensToText(cell.tokens));
       const truncated = this.pdf.splitTextToSize(
         text,
         colWidth - cellPadding * 2,
@@ -348,7 +388,7 @@ class PdfRenderer {
 
       this.y += cellPadding;
       row.forEach((cell, i) => {
-        const text = this.inlineTokensToText(cell.tokens);
+        const text = sanitizeForPdf(this.inlineTokensToText(cell.tokens));
         const truncated = this.pdf.splitTextToSize(
           text,
           colWidth - cellPadding * 2,
@@ -407,7 +447,7 @@ class PdfRenderer {
         break;
       case "html": {
         // Render raw HTML blocks as plain text (strip tags)
-        const htmlText = this.stripInlineHtml((token as Tokens.HTML).text);
+        const htmlText = sanitizeForPdf(this.stripInlineHtml((token as Tokens.HTML).text));
         if (htmlText.trim()) {
           const lines = this.wrapText(htmlText, FONT_SIZES.body);
           this.writeLines(lines, FONT_SIZES.body);
