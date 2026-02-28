@@ -1,28 +1,29 @@
 /* Shiki dual-theme support via CSS variables */
 /* defaultColor: false generates --shiki-light / --shiki-dark vars */
 
-:root {
-  --shiki-color: var(--shiki-light);
-  --shiki-bg: var(--shiki-light-bg);
-  --shiki-font-style: var(--shiki-light-font-style);
-  --shiki-font-weight: var(--shiki-light-font-weight);
-  --shiki-text-decoration: var(--shiki-light-text-decoration);
+.shiki,
+.shiki span {
+    color: var(--shiki-light);
+    background-color: var(--shiki-light-bg);
+    font-style: var(--shiki-light-font-style);
+    font-weight: var(--shiki-light-font-weight);
+    text-decoration: var(--shiki-light-text-decoration);
 }
 
-[data-theme="dark"] {
-  --shiki-color: var(--shiki-dark);
-  --shiki-bg: var(--shiki-dark-bg);
-  --shiki-font-style: var(--shiki-dark-font-style);
-  --shiki-font-weight: var(--shiki-dark-font-weight);
-  --shiki-text-decoration: var(--shiki-dark-text-decoration);
+[data-theme="dark"] .shiki,
+[data-theme="dark"] .shiki span {
+    color: var(--shiki-dark);
+    background-color: var(--shiki-dark-bg);
+    font-style: var(--shiki-dark-font-style);
+    font-weight: var(--shiki-dark-font-weight);
+    text-decoration: var(--shiki-dark-text-decoration);
 }
 
 /* Ensure shiki pre blocks blend with existing design */
-.markdown-body pre:has(code[class*="language-"]) {
-  background: var(--bg-code);
+.markdown-body pre.shiki {
+    background: var(--bg-code);
 }
 
-.markdown-body pre code {
-  background: none;
-  color: var(--shiki-color, var(--text-primary));
+.markdown-body pre.shiki code {
+    background: none;
 }

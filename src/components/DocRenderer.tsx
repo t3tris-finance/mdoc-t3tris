@@ -1,19 +1,20 @@
 import { useEffect, useState, useMemo } from "react";
 import { useLocation } from "react-router-dom";
-import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkFrontmatter from "remark-frontmatter";
 import rehypeShikiFromHighlighter from "@shikijs/rehype/core";
 import { createHighlighter, type HighlighterGeneric } from "shiki";
 import rehypeSlug from "rehype-slug";
 import rehypeRaw from "rehype-raw";
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkRehype from "remark-rehype";
+import rehypeStringify from "rehype-stringify";
 import type { DocEntry } from "../utils/docs";
 import { fetchMarkdown, findEntryByRoute } from "../utils/docs";
 import Breadcrumb from "./Breadcrumb";
 import ExportDropdown from "./ExportDropdown";
-import HeadingWithAnchor from "./HeadingWithAnchor";
 import { useI18n } from "../i18n";
-import type { Components } from "react-markdown";
 
 // Pre-create highlighter once (singleton promise)
 const highlighterPromise = createHighlighter({
@@ -33,43 +34,35 @@ interface DocRendererProps {
   entries: DocEntry[];
 }
 
-const markdownComponents: Partial<Components> = {
-  h1: ({ children, id }) => (
-    <HeadingWithAnchor level={1} id={id}>
-      {children}
-    </HeadingWithAnchor>
-  ),
-  h2: ({ children, id }) => (
-    <HeadingWithAnchor level={2} id={id}>
-      {children}
-    </HeadingWithAnchor>
-  ),
-  h3: ({ children, id }) => (
-    <HeadingWithAnchor level={3} id={id}>
-      {children}
-    </HeadingWithAnchor>
-  ),
-  h4: ({ children, id }) => (
-    <HeadingWithAnchor level={4} id={id}>
-      {children}
-    </HeadingWithAnchor>
-  ),
-  h5: ({ children, id }) => (
-    <HeadingWithAnchor level={5} id={id}>
-      {children}
-    </HeadingWithAnchor>
-  ),
-  h6: ({ children, id }) => (
-    <HeadingWithAnchor level={6} id={id}>
-      {children}
-    </HeadingWithAnchor>
-  ),
-};
+async function renderMarkdown(
+  md: string,
+  highlighter: HighlighterGeneric<any, any>,
+): Promise<string> {
+  const result = await unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkFrontmatter)
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeRaw)
+    .use(function () {
+      return rehypeShikiFromHighlighter(highlighter, {
+        themes: {
+          light: "github-light",
+          dark: "github-dark",
+        },
+        defaultColor: false,
+      });
+    })
+    .use(rehypeSlug)
+    .use(rehypeStringify, { allowDangerousHtml: true })
+    .process(md);
+  return String(result);
+}
 
 type DocState =
   | { status: "loading" }
   | { status: "error" }
-  | { status: "ready"; content: string };
+  | { status: "ready"; html: string };
 
 export default function DocRenderer({ entries }: DocRendererProps) {
   const location = useLocation();
@@ -91,7 +84,7 @@ export default function DocRenderer({ entries }: DocRendererProps) {
   }, []);
 
   useEffect(() => {
-    if (!currentEntry) return;
+    if (!currentEntry || !highlighter) return;
 
     let cancelled = false;
     setState({ status: "loading" });
@@ -104,7 +97,11 @@ export default function DocRenderer({ entries }: DocRendererProps) {
           const end = md.indexOf("---", 3);
           if (end !== -1) clean = md.slice(end + 3).trim();
         }
-        setState({ status: "ready", content: clean });
+        return renderMarkdown(clean, highlighter);
+      })
+      .then((html) => {
+        if (cancelled || !html) return;
+        setState({ status: "ready", html });
       })
       .catch(() => {
         if (!cancelled) setState({ status: "error" });
@@ -113,7 +110,7 @@ export default function DocRenderer({ entries }: DocRendererProps) {
     return () => {
       cancelled = true;
     };
-  }, [currentEntry]);
+  }, [currentEntry, highlighter]);
 
   // Scroll to heading if hash
   useEffect(() => {
@@ -136,7 +133,7 @@ export default function DocRenderer({ entries }: DocRendererProps) {
     );
   }
 
-  if (state.status === "loading" || !highlighter) {
+  if (state.status === "loading") {
     return (
       <div className="loading">
         <div className="loading-spinner" />
@@ -155,7 +152,6 @@ export default function DocRenderer({ entries }: DocRendererProps) {
     );
   }
 
-  const content = state.content;
   const shareUrl = window.location.href;
 
   const handleShare = async () => {
@@ -186,29 +182,10 @@ export default function DocRenderer({ entries }: DocRendererProps) {
           🔗 {t.share}
         </button>
       </div>
-      <div className="markdown-body">
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm, remarkFrontmatter]}
-          rehypePlugins={[
-            [
-              rehypeShikiFromHighlighter,
-              highlighter,
-              {
-                themes: {
-                  light: "github-light",
-                  dark: "github-dark",
-                },
-                defaultColor: false,
-              },
-            ],
-            rehypeSlug,
-            rehypeRaw,
-          ]}
-          components={markdownComponents}
-        >
-          {content}
-        </ReactMarkdown>
-      </div>
+      <div
+        className="markdown-body"
+        dangerouslySetInnerHTML={{ __html: state.html }}
+      />
     </div>
   );
 }
