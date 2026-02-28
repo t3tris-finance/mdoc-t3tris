@@ -43,10 +43,7 @@ interface DocRendererProps {
 function rehypeHeadingAnchors() {
   return (tree: Root) => {
     visit(tree, "element", (node: Element) => {
-      if (
-        /^h[1-6]$/.test(node.tagName) &&
-        node.properties?.id
-      ) {
+      if (/^h[1-6]$/.test(node.tagName) && node.properties?.id) {
         const slug = String(node.properties.id);
         // Add class for CSS hover behaviour
         node.properties.className = [
