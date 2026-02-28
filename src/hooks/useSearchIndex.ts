@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import GithubSlugger from "github-slugger";
 import type { DocEntry } from "../utils/docs";
 import { flattenEntries, fetchMarkdown, docPathToRoute } from "../utils/docs";
 
@@ -11,6 +12,8 @@ export interface SearchResult {
   snippet?: string;
   /** Whether the match is in the title (higher priority) */
   titleMatch: boolean;
+  /** Slug of the nearest heading above the match (for hash navigation) */
+  headingSlug?: string;
 }
 
 /**
@@ -50,6 +53,41 @@ function stripMarkdown(md: string): string {
 }
 
 /**
+ * Parses markdown into sections delimited by headings.
+ * Each section records the heading slug (matching rehype-slug / github-slugger)
+ * and the stripped plain text content beneath it.
+ */
+function parseSections(md: string): ContentSection[] {
+  const slugger = new GithubSlugger();
+  const clean = md.replace(/^---[\s\S]*?---\n?/, "");
+  const lines = clean.split("\n");
+  const sections: ContentSection[] = [{ slug: "", text: "" }];
+
+  for (const line of lines) {
+    const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
+    if (headingMatch) {
+      const headingText = headingMatch[2]
+        .replace(/\*{1,3}([^*]+)\*{1,3}/g, "$1")
+        .replace(/_{1,3}([^_]+)_{1,3}/g, "$1")
+        .replace(/`([^`]+)`/g, "$1")
+        .replace(/\[([^\]]+)\]\(.*?\)/g, "$1")
+        .trim();
+      const slug = slugger.slug(headingText);
+      sections.push({ slug, text: "" });
+    } else {
+      sections[sections.length - 1].text += line + "\n";
+    }
+  }
+
+  // Strip markdown from each section's accumulated text
+  for (const section of sections) {
+    section.text = stripMarkdown(section.text);
+  }
+
+  return sections;
+}
+
+/**
  * Extracts a snippet around the first occurrence of the query in text.
  */
 function extractSnippet(
@@ -71,12 +109,18 @@ function extractSnippet(
   return snippet;
 }
 
+interface ContentSection {
+  slug: string; // heading slug (empty string for content before first heading)
+  text: string; // stripped plain text of this section
+}
+
 interface IndexEntry {
   title: string;
   path: string;
   route: string;
   breadcrumb: string[];
   content: string; // plain text content for searching
+  sections: ContentSection[]; // content split by headings
 }
 
 /**
@@ -111,12 +155,17 @@ export function useSearchIndex(entries: DocEntry[]) {
           const content =
             result.status === "fulfilled" ? stripMarkdown(result.value) : "";
 
+          const sections = parseSections(
+            result.status === "fulfilled" ? result.value : "",
+          );
+
           results.push({
             title: entry.title,
             path: entry.path,
             route: docPathToRoute(entry.path),
             breadcrumb: entry.breadcrumb,
             content,
+            sections,
           });
         }
       }
@@ -156,6 +205,17 @@ export function useSearchIndex(entries: DocEntry[]) {
           ? extractSnippet(entry.content, words[0])
           : undefined;
 
+        // Find the heading slug for the first section that matches
+        let headingSlug: string | undefined;
+        if (contentMatch) {
+          for (const section of entry.sections) {
+            if (words.every((w) => section.text.toLowerCase().includes(w))) {
+              headingSlug = section.slug || undefined;
+              break;
+            }
+          }
+        }
+
         return {
           title: entry.title,
           path: entry.path,
@@ -163,6 +223,7 @@ export function useSearchIndex(entries: DocEntry[]) {
           breadcrumb: entry.breadcrumb,
           snippet,
           titleMatch,
+          headingSlug,
         } satisfies SearchResult;
       })
       .filter(Boolean)

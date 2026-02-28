@@ -100,7 +100,11 @@ export default function Sidebar({ entries, isOpen, onClose }: SidebarProps) {
                 {searchResults.map((result) => (
                   <Link
                     key={result.path}
-                    to={result.route}
+                    to={
+                      result.headingSlug
+                        ? `${result.route}#${result.headingSlug}`
+                        : result.route
+                    }
                     className={`sidebar-link search-result-item ${
                       location.pathname === result.route ? "active" : ""
                     }`}
