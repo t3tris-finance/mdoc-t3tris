@@ -90,16 +90,41 @@ function scanDir(dir: string, basePath: string): DocEntry[] {
 }
 
 const docsDir = join(process.cwd(), "docs");
-const manifest = scanDir(docsDir, "/docs");
+
+// Detect locale subdirectories (e.g. docs/en, docs/fr, docs/es, ...)
+const localeDirs = readdirSync(docsDir)
+  .filter((name) => {
+    const full = join(docsDir, name);
+    return statSync(full).isDirectory() && /^[a-z]{2}(-[a-z]{2})?$/i.test(name);
+  })
+  .sort();
+
+if (localeDirs.length === 0) {
+  console.error(
+    "❌ No locale folders found in docs/ (e.g. docs/en/, docs/fr/)",
+  );
+  process.exit(1);
+}
 
 const outDir = join(process.cwd(), "public");
 if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
 
-writeFileSync(
-  join(outDir, "docs-manifest.json"),
-  JSON.stringify(manifest, null, 2),
-);
-console.log("✅ docs-manifest.json generated successfully!");
+let totalDocs = 0;
+
+for (const locale of localeDirs) {
+  const localeDocsDir = join(docsDir, locale);
+  const manifest = scanDir(localeDocsDir, `/docs/${locale}`);
+  const outputFile = join(outDir, `docs-manifest.${locale}.json`);
+
+  writeFileSync(outputFile, JSON.stringify(manifest, null, 2));
+
+  const docCount = JSON.stringify(manifest, null, 2).split('"path"').length - 1;
+  totalDocs += docCount;
+  console.log(
+    `✅ docs-manifest.${locale}.json generated (${docCount} document(s))`,
+  );
+}
+
 console.log(
-  `   Found ${JSON.stringify(manifest, null, 2).split('"path"').length - 1} document(s)`,
+  `\n📚 ${localeDirs.length} locale(s) processed: ${localeDirs.join(", ")} — ${totalDocs} total document(s)`,
 );

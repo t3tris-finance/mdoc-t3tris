@@ -6,9 +6,18 @@ export interface DocEntry {
   children?: DocEntry[];
 }
 
-export async function fetchManifest(): Promise<DocEntry[]> {
-  const res = await fetch("/docs-manifest.json");
-  if (!res.ok) throw new Error("Failed to load docs manifest");
+export async function fetchManifest(
+  locale: string = "en",
+): Promise<DocEntry[]> {
+  const res = await fetch(`/docs-manifest.${locale}.json`);
+  if (!res.ok) {
+    // Fallback to English if locale manifest not found
+    if (locale !== "en") {
+      const fallback = await fetch("/docs-manifest.en.json");
+      if (fallback.ok) return fallback.json();
+    }
+    throw new Error("Failed to load docs manifest");
+  }
   return res.json();
 }
 
@@ -50,11 +59,11 @@ export function flattenEntries(
 
 /**
  * Calculate the route path from a doc file path.
- * e.g., /docs/01-getting-started/02-installation.md -> /getting-started/installation
+ * e.g., /docs/en/01-getting-started/02-installation.md -> /getting-started/installation
  */
 export function docPathToRoute(docPath: string): string {
   return docPath
-    .replace(/^\/docs/, "")
+    .replace(/^\/docs\/[a-z]{2}(-[a-z]{2})?/i, "") // strip /docs/{locale}
     .replace(/\.md$/, "")
     .replace(/\/index$/, "")
     .replace(/\/\d+-/g, "/")

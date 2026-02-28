@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import type { DocEntry } from "../utils/docs";
 import { docPathToRoute } from "../utils/docs";
+import { useI18n } from "../i18n";
 
 interface SidebarProps {
   entries: DocEntry[];
@@ -13,6 +14,7 @@ export default function Sidebar({ entries, isOpen, onClose }: SidebarProps) {
   const location = useLocation();
   const [search, setSearch] = useState("");
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const { t } = useI18n();
 
   const filteredEntries = useMemo(() => {
     function filterEntries(items: DocEntry[], query: string): DocEntry[] {
@@ -50,7 +52,7 @@ export default function Sidebar({ entries, isOpen, onClose }: SidebarProps) {
           <span className="search-icon">🔍</span>
           <input
             type="text"
-            placeholder="Search..."
+            placeholder={t.search}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />

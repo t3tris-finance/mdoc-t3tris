@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useI18n } from "../i18n";
 
 interface BreadcrumbProps {
   items: string[];
@@ -6,9 +7,11 @@ interface BreadcrumbProps {
 }
 
 export default function Breadcrumb({ items, current }: BreadcrumbProps) {
+  const { t } = useI18n();
+
   return (
     <div className="breadcrumb">
-      <Link to="/">🏠 Home</Link>
+      <Link to="/">🏠 {t.home}</Link>
       {items.map((item, i) => (
         <span key={i}>
           <span className="separator"> › </span>

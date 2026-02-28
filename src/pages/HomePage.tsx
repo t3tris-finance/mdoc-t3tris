@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import type { DocEntry } from "../utils/docs";
 import { docPathToRoute, flattenEntries } from "../utils/docs";
+import { useI18n } from "../i18n";
 
 interface HomePageProps {
   entries: DocEntry[];
@@ -9,15 +10,13 @@ interface HomePageProps {
 
 export default function HomePage({ entries }: HomePageProps) {
   const allPages = useMemo(() => flattenEntries(entries), [entries]);
+  const { t } = useI18n();
 
   return (
     <div>
       <div className="markdown-body">
-        <h1>📚 Documentation</h1>
-        <p>
-          Welcome to the documentation. Use the sidebar to navigate between
-          sections, or explore the pages below.
-        </p>
+        <h1>📚 {t.documentation}</h1>
+        <p>{t.homeWelcome}</p>
 
         {entries.map((section) => (
           <div key={section.slug} style={{ marginBottom: "2rem" }}>
@@ -47,10 +46,9 @@ export default function HomePage({ entries }: HomePageProps) {
             }}
           >
             <p style={{ fontSize: "3rem", marginBottom: "1rem" }}>📂</p>
-            <p>No documentation found.</p>
+            <p>{t.noDocsFound}</p>
             <p style={{ fontSize: "0.875rem", marginTop: "0.5rem" }}>
-              Add <code>.md</code> files to the <code>docs/</code> folder to get
-              started.
+              {t.noDocsHint}
             </p>
           </div>
         )}

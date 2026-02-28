@@ -11,6 +11,7 @@ import { fetchMarkdown, findEntryByRoute } from "../utils/docs";
 import Breadcrumb from "./Breadcrumb";
 import ExportDropdown from "./ExportDropdown";
 import HeadingWithAnchor from "./HeadingWithAnchor";
+import { useI18n } from "../i18n";
 import type { Components } from "react-markdown";
 
 interface DocRendererProps {
@@ -58,6 +59,7 @@ type DocState =
 export default function DocRenderer({ entries }: DocRendererProps) {
   const location = useLocation();
   const [state, setState] = useState<DocState>({ status: "loading" });
+  const { t } = useI18n();
 
   const currentEntry = useMemo(
     () => findEntryByRoute(entries, location.pathname),
@@ -104,8 +106,8 @@ export default function DocRenderer({ entries }: DocRendererProps) {
     return (
       <div className="not-found">
         <h1>404</h1>
-        <p>Page not found</p>
-        <a href="/">← Back to home</a>
+        <p>{t.pageNotFound}</p>
+        <a href="/">{t.backToHome}</a>
       </div>
     );
   }
@@ -114,7 +116,7 @@ export default function DocRenderer({ entries }: DocRendererProps) {
     return (
       <div className="loading">
         <div className="loading-spinner" />
-        Loading...
+        {t.loading}
       </div>
     );
   }
@@ -122,9 +124,9 @@ export default function DocRenderer({ entries }: DocRendererProps) {
   if (state.status === "error") {
     return (
       <div className="not-found">
-        <h1>Error</h1>
-        <p>Unable to load this page</p>
-        <a href="/">← Back to home</a>
+        <h1>{t.error}</h1>
+        <p>{t.unableToLoad}</p>
+        <a href="/">{t.backToHome}</a>
       </div>
     );
   }
@@ -140,7 +142,7 @@ export default function DocRenderer({ entries }: DocRendererProps) {
       });
     } else {
       await navigator.clipboard.writeText(shareUrl);
-      alert("Link copied to clipboard!");
+      alert(t.linkCopied);
     }
   };
 
@@ -157,7 +159,7 @@ export default function DocRenderer({ entries }: DocRendererProps) {
           allEntries={entries}
         />
         <button className="btn" onClick={handleShare}>
-          🔗 Share
+          🔗 {t.share}
         </button>
       </div>
       <div className="markdown-body">

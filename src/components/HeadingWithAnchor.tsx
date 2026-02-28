@@ -1,4 +1,5 @@
 import type { JSX, ReactNode } from "react";
+import { useI18n } from "../i18n";
 
 function getTextContent(children: ReactNode): string {
   if (typeof children === "string") return children;
@@ -23,6 +24,7 @@ export default function HeadingWithAnchor({
 }: HeadingProps) {
   const Tag = `h${level}` as keyof JSX.IntrinsicElements;
   const slug = id || "";
+  const { t } = useI18n();
 
   const handleCopyLink = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -42,11 +44,11 @@ export default function HeadingWithAnchor({
           href={`#${slug}`}
           className="heading-anchor"
           onClick={handleCopyLink}
-          aria-label={`Link to section "${getTextContent(children)}"`}
-          title="Copy link to this section"
+          aria-label={t.linkToSection(getTextContent(children))}
+          title={t.copyLinkToSection}
         >
           <span className="anchor-icon">#</span>
-          <span className="anchor-copied-label">Copied!</span>
+          <span className="anchor-copied-label">{t.copied}</span>
         </a>
       )}
     </Tag>

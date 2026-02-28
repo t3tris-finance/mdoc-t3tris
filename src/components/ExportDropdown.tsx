@@ -7,6 +7,7 @@ import {
   exportAsText,
   exportAllAsZip,
 } from "../utils/export";
+import { useI18n } from "../i18n";
 
 interface ExportDropdownProps {
   docPath: string;
@@ -22,6 +23,7 @@ export default function ExportDropdown({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { t } = useI18n();
 
   const handleExport = async (fn: () => Promise<void>) => {
     setLoading(true);
@@ -38,7 +40,7 @@ export default function ExportDropdown({
   return (
     <div className="export-dropdown" ref={dropdownRef}>
       <button className="btn" onClick={() => setOpen(!open)} disabled={loading}>
-        {loading ? "⏳" : "📥"} Export
+        {loading ? "⏳" : "📥"} {t.export}
       </button>
       {open && (
         <>
@@ -47,7 +49,7 @@ export default function ExportDropdown({
             onClick={() => setOpen(false)}
           />
           <div className="export-menu">
-            <div className="export-menu-title">This page</div>
+            <div className="export-menu-title">{t.thisPage}</div>
             <button
               className="export-menu-item"
               onClick={() =>
@@ -72,17 +74,17 @@ export default function ExportDropdown({
               className="export-menu-item"
               onClick={() => handleExport(() => exportAsText(docPath, title))}
             >
-              📃 Plain text (.txt)
+              📃 {t.plainText}
             </button>
             <div className="export-menu-divider" />
-            <div className="export-menu-title">All documentation</div>
+            <div className="export-menu-title">{t.allDocumentation}</div>
             <button
               className="export-menu-item"
               onClick={() =>
                 handleExport(() => exportAllAsZip(allEntries, "md"))
               }
             >
-              📦 All as Markdown (.zip)
+              📦 {t.allAsMarkdown}
             </button>
             <button
               className="export-menu-item"
@@ -90,7 +92,7 @@ export default function ExportDropdown({
                 handleExport(() => exportAllAsZip(allEntries, "html"))
               }
             >
-              📦 All as HTML (.zip)
+              📦 {t.allAsHTML}
             </button>
             <button
               className="export-menu-item"
@@ -98,7 +100,7 @@ export default function ExportDropdown({
                 handleExport(() => exportAllAsZip(allEntries, "txt"))
               }
             >
-              📦 All as Text (.zip)
+              📦 {t.allAsText}
             </button>
           </div>
         </>
