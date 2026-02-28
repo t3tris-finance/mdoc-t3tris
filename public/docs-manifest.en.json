@@ -1,0 +1,164 @@
+[
+  {
+    "title": "Introduction",
+    "slug": "01-introduction",
+    "path": "/docs/en/01-introduction.md",
+    "order": 1
+  },
+  {
+    "title": "Liquidity Providers",
+    "slug": "02-liquidity-providers",
+    "path": "/docs/en/02-liquidity-providers",
+    "order": 2,
+    "children": [
+      {
+        "title": "Getting Started",
+        "slug": "01-getting-started",
+        "path": "/docs/en/02-liquidity-providers/01-getting-started.md",
+        "order": 1
+      },
+      {
+        "title": "Depositing Assets",
+        "slug": "02-depositing",
+        "path": "/docs/en/02-liquidity-providers/02-depositing.md",
+        "order": 2
+      },
+      {
+        "title": "Withdrawing Assets",
+        "slug": "03-withdrawing",
+        "path": "/docs/en/02-liquidity-providers/03-withdrawing.md",
+        "order": 3
+      },
+      {
+        "title": "Tracking Your Position",
+        "slug": "04-tracking-position",
+        "path": "/docs/en/02-liquidity-providers/04-tracking-position.md",
+        "order": 4
+      },
+      {
+        "title": "Understanding Fees",
+        "slug": "05-understanding-fees",
+        "path": "/docs/en/02-liquidity-providers/05-understanding-fees.md",
+        "order": 5
+      }
+    ]
+  },
+  {
+    "title": "Asset Managers",
+    "slug": "03-asset-managers",
+    "path": "/docs/en/03-asset-managers",
+    "order": 3,
+    "children": [
+      {
+        "title": "Asset Manager Overview",
+        "slug": "01-overview",
+        "path": "/docs/en/03-asset-managers/01-overview.md",
+        "order": 1
+      },
+      {
+        "title": "Vault Operations",
+        "slug": "02-vault-operations",
+        "path": "/docs/en/03-asset-managers/02-vault-operations.md",
+        "order": 2
+      },
+      {
+        "title": "Settlement",
+        "slug": "03-settlement",
+        "path": "/docs/en/03-asset-managers/03-settlement.md",
+        "order": 3
+      },
+      {
+        "title": "Fee Management",
+        "slug": "04-fee-management",
+        "path": "/docs/en/03-asset-managers/04-fee-management.md",
+        "order": 4
+      },
+      {
+        "title": "Silo Management",
+        "slug": "05-silo-management",
+        "path": "/docs/en/03-asset-managers/05-silo-management.md",
+        "order": 5
+      },
+      {
+        "title": "Oracle Management",
+        "slug": "06-oracle-management",
+        "path": "/docs/en/03-asset-managers/06-oracle-management.md",
+        "order": 6
+      }
+    ]
+  },
+  {
+    "title": "Developers",
+    "slug": "04-developers",
+    "path": "/docs/en/04-developers",
+    "order": 4,
+    "children": [
+      {
+        "title": "Architecture Overview",
+        "slug": "01-architecture",
+        "path": "/docs/en/04-developers/01-architecture.md",
+        "order": 1
+      },
+      {
+        "title": "Vault Contract",
+        "slug": "02-vault-contract",
+        "path": "/docs/en/04-developers/02-vault-contract.md",
+        "order": 2
+      },
+      {
+        "title": "Silo Contract",
+        "slug": "03-silo-contract",
+        "path": "/docs/en/04-developers/03-silo-contract.md",
+        "order": 3
+      },
+      {
+        "title": "Protocol Factory",
+        "slug": "04-protocol-factory",
+        "path": "/docs/en/04-developers/04-protocol-factory.md",
+        "order": 4
+      },
+      {
+        "title": "SafeOracle",
+        "slug": "05-safe-oracle",
+        "path": "/docs/en/04-developers/05-safe-oracle.md",
+        "order": 5
+      },
+      {
+        "title": "Access Control",
+        "slug": "06-access-control",
+        "path": "/docs/en/04-developers/06-access-control.md",
+        "order": 6
+      },
+      {
+        "title": "Storage Layout",
+        "slug": "07-storage-layout",
+        "path": "/docs/en/04-developers/07-storage-layout.md",
+        "order": 7
+      },
+      {
+        "title": "Integration Guide",
+        "slug": "08-integration-guide",
+        "path": "/docs/en/04-developers/08-integration-guide.md",
+        "order": 8
+      },
+      {
+        "title": "Events Reference",
+        "slug": "09-events-reference",
+        "path": "/docs/en/04-developers/09-events-reference.md",
+        "order": 9
+      },
+      {
+        "title": "Errors Reference",
+        "slug": "10-errors-reference",
+        "path": "/docs/en/04-developers/10-errors-reference.md",
+        "order": 10
+      },
+      {
+        "title": "Deployment Guide",
+        "slug": "11-deployment",
+        "path": "/docs/en/04-developers/11-deployment.md",
+        "order": 11
+      }
+    ]
+  }
+]
