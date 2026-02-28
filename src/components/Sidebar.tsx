@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import type { DocEntry } from "../utils/docs";
 import { docPathToRoute } from "../utils/docs";
 import { useI18n } from "../i18n";
+import { useSearchIndex } from "../hooks/useSearchIndex";
 
 interface SidebarProps {
   entries: DocEntry[];
@@ -15,7 +16,15 @@ export default function Sidebar({ entries, isOpen, onClose }: SidebarProps) {
   const [search, setSearch] = useState("");
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const { t } = useI18n();
+  const { search: searchDocs, indexReady } = useSearchIndex(entries);
 
+  // Full-text search results
+  const searchResults = useMemo(() => {
+    if (!search.trim()) return null;
+    return searchDocs(search);
+  }, [search, searchDocs]);
+
+  // Fallback: title-only filter for tree view when index not ready
   const filteredEntries = useMemo(() => {
     function filterEntries(items: DocEntry[], query: string): DocEntry[] {
       return items
@@ -58,17 +67,48 @@ export default function Sidebar({ entries, isOpen, onClose }: SidebarProps) {
           />
         </div>
         <nav>
-          {filteredEntries.map((entry) => (
-            <SidebarItem
-              key={entry.slug}
-              entry={entry}
-              currentPath={location.pathname}
-              collapsed={collapsed}
-              onToggle={toggleSection}
-              onNavigate={onClose}
-              depth={0}
-            />
-          ))}
+          {search.trim() && indexReady && searchResults ? (
+            searchResults.length > 0 ? (
+              <div className="search-results">
+                {searchResults.map((result) => (
+                  <Link
+                    key={result.path}
+                    to={result.route}
+                    className={`sidebar-link search-result-item ${
+                      location.pathname === result.route ? "active" : ""
+                    }`}
+                    onClick={onClose}
+                  >
+                    <span className="search-result-title">{result.title}</span>
+                    {result.breadcrumb.length > 0 && (
+                      <span className="search-result-breadcrumb">
+                        {result.breadcrumb.join(" › ")}
+                      </span>
+                    )}
+                    {result.snippet && (
+                      <span className="search-result-snippet">
+                        {result.snippet}
+                      </span>
+                    )}
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="search-no-results">{t.noDocsFound}</div>
+            )
+          ) : (
+            filteredEntries.map((entry) => (
+              <SidebarItem
+                key={entry.slug}
+                entry={entry}
+                currentPath={location.pathname}
+                collapsed={collapsed}
+                onToggle={toggleSection}
+                onNavigate={onClose}
+                depth={0}
+              />
+            ))
+          )}
         </nav>
       </aside>
     </>

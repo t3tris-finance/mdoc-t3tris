@@ -738,6 +738,48 @@ a:hover {
     flex-shrink: 0;
 }
 
+/* Search results */
+.search-results {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.search-result-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.5rem 0.75rem !important;
+}
+
+.search-result-title {
+    font-weight: 500;
+    font-size: 0.8125rem;
+}
+
+.search-result-breadcrumb {
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+}
+
+.search-result-snippet {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-style: italic;
+}
+
+.search-no-results {
+    padding: 1rem 0.75rem;
+    color: var(--text-tertiary);
+    font-size: 0.8125rem;
+    text-align: center;
+}
+
 /* Breadcrumb */
 .breadcrumb {
     display: flex;
