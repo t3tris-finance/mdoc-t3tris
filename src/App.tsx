@@ -55,7 +55,7 @@ export default function App() {
               className="header-logo"
               style={{ textDecoration: "none" }}
             >
-              m<span>Doc</span>
+              T3<span>tris</span>
             </a>
           </div>
           <div className="header-right">
