@@ -780,6 +780,14 @@ a:hover {
     text-align: center;
 }
 
+.search-highlight {
+    background: var(--accent-light, rgba(99, 102, 241, 0.15));
+    color: var(--accent, #6366f1);
+    border-radius: 2px;
+    padding: 0 1px;
+    font-style: normal;
+}
+
 /* Breadcrumb */
 .breadcrumb {
     display: flex;

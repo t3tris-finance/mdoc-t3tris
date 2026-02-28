@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import type { DocEntry } from "../utils/docs";
 import { docPathToRoute, flattenEntries } from "../utils/docs";
 import { useI18n } from "../i18n";
+import SEO from "../components/SEO";
 
 interface HomePageProps {
   entries: DocEntry[];
@@ -10,10 +11,17 @@ interface HomePageProps {
 
 export default function HomePage({ entries }: HomePageProps) {
   const allPages = useMemo(() => flattenEntries(entries), [entries]);
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   return (
     <div>
+      <SEO
+        title="Documentation"
+        description="T3tris Protocol documentation — a tokenized vault protocol built on ERC-4626 for professional asset management. Guides for liquidity providers, asset managers, and developers."
+        path="/"
+        type="website"
+        locale={locale}
+      />
       <div className="markdown-body">
         <h1>📚 {t.documentation}</h1>
         <p>{t.homeWelcome}</p>

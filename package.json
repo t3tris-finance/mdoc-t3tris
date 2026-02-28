@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "docs:gen": "bun scripts/generate-manifest.ts",
+    "sitemap:gen": "bun scripts/generate-sitemap.ts",
+    "prerender": "bun scripts/prerender.ts",
     "dev": "bun run docs:gen && vite",
-    "build": "bun run docs:gen && tsc -b && vite build",
+    "build": "bun run docs:gen && bun run sitemap:gen && tsc -b && vite build && bun run prerender",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -21,6 +23,7 @@
     "marked": "^17.0.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-helmet-async": "^2.0.5",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.13.1",
     "rehype-raw": "^7.0.0",

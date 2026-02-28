@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://docs.t3tris.xyz/sitemap.xml
+
+# Disallow internal/dev paths
+Disallow: /api/
+Disallow: /_next/
+Disallow: /assets/

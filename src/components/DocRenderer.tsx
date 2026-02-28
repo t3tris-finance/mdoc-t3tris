@@ -16,6 +16,7 @@ import type { DocEntry } from "../utils/docs";
 import { fetchMarkdown, findEntryByRoute } from "../utils/docs";
 import Breadcrumb from "./Breadcrumb";
 import ExportDropdown from "./ExportDropdown";
+import SEO from "./SEO";
 import { useI18n } from "../i18n";
 
 // Pre-create highlighter once (singleton promise)
@@ -120,7 +121,7 @@ export default function DocRenderer({ entries }: DocRendererProps) {
     any,
     any
   > | null>(null);
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const markdownBodyRef = useRef<HTMLDivElement>(null);
 
   const currentEntry = useMemo(
@@ -241,6 +242,13 @@ export default function DocRenderer({ entries }: DocRendererProps) {
 
   return (
     <div>
+      <SEO
+        title={currentEntry.title}
+        description={`${currentEntry.title} — T3tris Protocol documentation. ${currentEntry.breadcrumb.length > 0 ? `Part of ${currentEntry.breadcrumb.join(" > ")}.` : ""}`}
+        path={location.pathname}
+        breadcrumb={currentEntry.breadcrumb}
+        locale={locale}
+      />
       <Breadcrumb
         items={currentEntry.breadcrumb}
         current={currentEntry.title}
@@ -255,7 +263,7 @@ export default function DocRenderer({ entries }: DocRendererProps) {
           🔗 {t.share}
         </button>
       </div>
-      <div
+      <article
         ref={markdownBodyRef}
         className="markdown-body"
         dangerouslySetInnerHTML={{ __html: state.html }}

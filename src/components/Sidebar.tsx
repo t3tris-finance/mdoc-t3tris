@@ -1,9 +1,36 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import type { DocEntry } from "../utils/docs";
 import { docPathToRoute } from "../utils/docs";
 import { useI18n } from "../i18n";
 import { useSearchIndex } from "../hooks/useSearchIndex";
+
+/**
+ * Highlights all occurrences of query words in text by wrapping them in <mark>.
+ */
+function highlightText(text: string, query: string): ReactNode {
+  if (!query.trim()) return text;
+  const words = query
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  if (words.length === 0) return text;
+
+  const regex = new RegExp(`(${words.join("|")})`, "gi");
+  const parts = text.split(regex);
+  if (parts.length <= 1) return text;
+
+  return parts.map((part, i) =>
+    regex.test(part) ? (
+      <mark key={i} className="search-highlight">
+        {part}
+      </mark>
+    ) : (
+      part
+    ),
+  );
+}
 
 interface SidebarProps {
   entries: DocEntry[];
@@ -79,7 +106,9 @@ export default function Sidebar({ entries, isOpen, onClose }: SidebarProps) {
                     }`}
                     onClick={onClose}
                   >
-                    <span className="search-result-title">{result.title}</span>
+                    <span className="search-result-title">
+                      {highlightText(result.title, search)}
+                    </span>
                     {result.breadcrumb.length > 0 && (
                       <span className="search-result-breadcrumb">
                         {result.breadcrumb.join(" › ")}
@@ -87,7 +116,7 @@ export default function Sidebar({ entries, isOpen, onClose }: SidebarProps) {
                     )}
                     {result.snippet && (
                       <span className="search-result-snippet">
-                        {result.snippet}
+                        {highlightText(result.snippet, search)}
                       </span>
                     )}
                   </Link>
