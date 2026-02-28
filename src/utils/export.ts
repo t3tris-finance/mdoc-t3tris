@@ -248,15 +248,17 @@ class PdfRenderer {
   }
 
   private renderBlockquote(token: Tokens.Blockquote) {
-    const text = sanitizeForPdf(token.tokens
-      .map((t) =>
-        "tokens" in t && t.tokens
-          ? this.inlineTokensToText(t.tokens)
-          : "text" in t
-            ? (t as Tokens.Text).text
-            : "",
-      )
-      .join(" "));
+    const text = sanitizeForPdf(
+      token.tokens
+        .map((t) =>
+          "tokens" in t && t.tokens
+            ? this.inlineTokensToText(t.tokens)
+            : "text" in t
+              ? (t as Tokens.Text).text
+              : "",
+        )
+        .join(" "),
+    );
 
     const lines = this.wrapText(text, FONT_SIZES.body, "italic");
     const lineH = (FONT_SIZES.body * LINE_HEIGHT * 25.4) / 72;
@@ -292,17 +294,19 @@ class PdfRenderer {
 
     token.items.forEach((item, idx) => {
       const bullet = token.ordered ? `${idx + 1}.` : "-";
-      const text = sanitizeForPdf(item.tokens
-        .filter(
-          (t): t is Tokens.Paragraph | Tokens.Text =>
-            t.type === "text" || t.type === "paragraph",
-        )
-        .map((t) =>
-          "tokens" in t && t.tokens
-            ? this.inlineTokensToText(t.tokens)
-            : (t as Tokens.Text).text,
-        )
-        .join(" "));
+      const text = sanitizeForPdf(
+        item.tokens
+          .filter(
+            (t): t is Tokens.Paragraph | Tokens.Text =>
+              t.type === "text" || t.type === "paragraph",
+          )
+          .map((t) =>
+            "tokens" in t && t.tokens
+              ? this.inlineTokensToText(t.tokens)
+              : (t as Tokens.Text).text,
+          )
+          .join(" "),
+      );
 
       const lines = this.pdf.splitTextToSize(
         text,
@@ -447,7 +451,9 @@ class PdfRenderer {
         break;
       case "html": {
         // Render raw HTML blocks as plain text (strip tags)
-        const htmlText = sanitizeForPdf(this.stripInlineHtml((token as Tokens.HTML).text));
+        const htmlText = sanitizeForPdf(
+          this.stripInlineHtml((token as Tokens.HTML).text),
+        );
         if (htmlText.trim()) {
           const lines = this.wrapText(htmlText, FONT_SIZES.body);
           this.writeLines(lines, FONT_SIZES.body);

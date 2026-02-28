@@ -3,7 +3,8 @@ import { useLocation } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkFrontmatter from "remark-frontmatter";
-import rehypeShiki from "@shikijs/rehype";
+import rehypeShikiFromHighlighter from "@shikijs/rehype/core";
+import { createHighlighter, type HighlighterGeneric } from "shiki";
 import rehypeSlug from "rehype-slug";
 import rehypeRaw from "rehype-raw";
 import type { DocEntry } from "../utils/docs";
@@ -13,6 +14,20 @@ import ExportDropdown from "./ExportDropdown";
 import HeadingWithAnchor from "./HeadingWithAnchor";
 import { useI18n } from "../i18n";
 import type { Components } from "react-markdown";
+
+// Pre-create highlighter once (singleton promise)
+const highlighterPromise = createHighlighter({
+  themes: ["github-light", "github-dark"],
+  langs: [
+    "solidity",
+    "typescript",
+    "bash",
+    "javascript",
+    "json",
+    "yaml",
+    "markdown",
+  ],
+});
 
 interface DocRendererProps {
   entries: DocEntry[];
@@ -59,12 +74,21 @@ type DocState =
 export default function DocRenderer({ entries }: DocRendererProps) {
   const location = useLocation();
   const [state, setState] = useState<DocState>({ status: "loading" });
+  const [highlighter, setHighlighter] = useState<HighlighterGeneric<
+    any,
+    any
+  > | null>(null);
   const { t } = useI18n();
 
   const currentEntry = useMemo(
     () => findEntryByRoute(entries, location.pathname),
     [entries, location.pathname],
   );
+
+  // Load highlighter once
+  useEffect(() => {
+    highlighterPromise.then(setHighlighter);
+  }, []);
 
   useEffect(() => {
     if (!currentEntry) return;
@@ -112,7 +136,7 @@ export default function DocRenderer({ entries }: DocRendererProps) {
     );
   }
 
-  if (state.status === "loading") {
+  if (state.status === "loading" || !highlighter) {
     return (
       <div className="loading">
         <div className="loading-spinner" />
@@ -167,7 +191,8 @@ export default function DocRenderer({ entries }: DocRendererProps) {
           remarkPlugins={[remarkGfm, remarkFrontmatter]}
           rehypePlugins={[
             [
-              rehypeShiki,
+              rehypeShikiFromHighlighter,
+              highlighter,
               {
                 themes: {
                   light: "github-light",
