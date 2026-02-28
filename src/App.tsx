@@ -2,28 +2,24 @@ import { useState, useEffect, useMemo } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import ThemeToggle from "./components/ThemeToggle";
-import LanguageSwitcher from "./components/LanguageSwitcher";
 import DocRenderer from "./components/DocRenderer";
 import HomePage from "./pages/HomePage";
 import { useTheme } from "./hooks/useTheme";
-import { useI18n } from "./i18n";
 import { fetchManifest, flattenEntries, docPathToRoute } from "./utils/docs";
 import type { DocEntry } from "./utils/docs";
 
 export default function App() {
   const { theme, toggleTheme } = useTheme();
-  const { t, locale } = useI18n();
   const [entries, setEntries] = useState<DocEntry[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
-    fetchManifest(locale)
+    fetchManifest()
       .then(setEntries)
       .catch((err) => console.error("Failed to load manifest:", err))
       .finally(() => setLoading(false));
-  }, [locale]);
+  }, []);
 
   const routes = useMemo(() => {
     const flat = flattenEntries(entries);
@@ -37,7 +33,7 @@ export default function App() {
     return (
       <div className="loading" style={{ height: "100vh" }}>
         <div className="loading-spinner" />
-        {t.loadingDocumentation}
+        Loading documentation...
       </div>
     );
   }
@@ -50,7 +46,7 @@ export default function App() {
             <button
               className="menu-toggle"
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              aria-label={t.toggleMenu}
+              aria-label="Toggle menu"
             >
               {sidebarOpen ? "✕" : "☰"}
             </button>
@@ -63,7 +59,6 @@ export default function App() {
             </a>
           </div>
           <div className="header-right">
-            <LanguageSwitcher />
             <ThemeToggle theme={theme} onToggle={toggleTheme} />
           </div>
         </header>

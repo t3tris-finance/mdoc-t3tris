@@ -16,6 +16,7 @@
     "front-matter": "^4.0.2",
     "gray-matter": "^4.0.3",
     "highlight.js": "^11.11.1",
+    "highlightjs-solidity": "^2.0.6",
     "jspdf": "^4.2.0",
     "jszip": "^3.10.1",
     "marked": "^17.0.3",

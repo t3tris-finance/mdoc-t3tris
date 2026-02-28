@@ -1,4 +1,4 @@
-import type { LocaleConfig } from "./types";
+import type { LocaleConfig } from "../types";
 
 const en: LocaleConfig = {
   code: "en",
