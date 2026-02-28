@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import remarkGfm from "remark-gfm";
 import remarkFrontmatter from "remark-frontmatter";
@@ -10,6 +10,8 @@ import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import rehypeStringify from "rehype-stringify";
+import { visit } from "unist-util-visit";
+import type { Root, Element } from "hast";
 import type { DocEntry } from "../utils/docs";
 import { fetchMarkdown, findEntryByRoute } from "../utils/docs";
 import Breadcrumb from "./Breadcrumb";
@@ -34,6 +36,55 @@ interface DocRendererProps {
   entries: DocEntry[];
 }
 
+/**
+ * Rehype plugin that adds anchor links to headings (h1-h6) that have an id.
+ * Produces markup compatible with the existing .heading-anchor-group CSS.
+ */
+function rehypeHeadingAnchors() {
+  return (tree: Root) => {
+    visit(tree, "element", (node: Element) => {
+      if (
+        /^h[1-6]$/.test(node.tagName) &&
+        node.properties?.id
+      ) {
+        const slug = String(node.properties.id);
+        // Add class for CSS hover behaviour
+        node.properties.className = [
+          ...((node.properties.className as string[]) || []),
+          "heading-anchor-group",
+        ];
+        // Append the anchor element
+        const anchor: Element = {
+          type: "element",
+          tagName: "a",
+          properties: {
+            href: `#${slug}`,
+            className: ["heading-anchor"],
+            "aria-label": `Link to section`,
+            title: "Copy link to this section",
+            "data-anchor": slug,
+          },
+          children: [
+            {
+              type: "element",
+              tagName: "span",
+              properties: { className: ["anchor-icon"] },
+              children: [{ type: "text", value: "#" }],
+            },
+            {
+              type: "element",
+              tagName: "span",
+              properties: { className: ["anchor-copied-label"] },
+              children: [{ type: "text", value: "Copied!" }],
+            },
+          ],
+        };
+        node.children.push(anchor);
+      }
+    });
+  };
+}
+
 async function renderMarkdown(
   md: string,
   highlighter: HighlighterGeneric<any, any>,
@@ -54,6 +105,7 @@ async function renderMarkdown(
       });
     })
     .use(rehypeSlug)
+    .use(rehypeHeadingAnchors)
     .use(rehypeStringify, { allowDangerousHtml: true })
     .process(md);
   return String(result);
@@ -72,6 +124,7 @@ export default function DocRenderer({ entries }: DocRendererProps) {
     any
   > | null>(null);
   const { t } = useI18n();
+  const markdownBodyRef = useRef<HTMLDivElement>(null);
 
   const currentEntry = useMemo(
     () => findEntryByRoute(entries, location.pathname),
@@ -122,6 +175,29 @@ export default function DocRenderer({ entries }: DocRendererProps) {
       window.scrollTo(0, 0);
     }
   }, [state, location.hash]);
+
+  // Attach click handlers for anchor copy-link behaviour
+  useEffect(() => {
+    if (state.status !== "ready" || !markdownBodyRef.current) return;
+    const container = markdownBodyRef.current;
+
+    const handleClick = (e: MouseEvent) => {
+      const anchor = (e.target as HTMLElement).closest<HTMLAnchorElement>(
+        "a.heading-anchor[data-anchor]",
+      );
+      if (!anchor) return;
+      e.preventDefault();
+      const slug = anchor.dataset.anchor!;
+      const url = `${window.location.origin}${window.location.pathname}#${slug}`;
+      navigator.clipboard.writeText(url).then(() => {
+        anchor.classList.add("copied");
+        setTimeout(() => anchor.classList.remove("copied"), 2000);
+      });
+    };
+
+    container.addEventListener("click", handleClick);
+    return () => container.removeEventListener("click", handleClick);
+  }, [state]);
 
   if (!currentEntry) {
     return (
@@ -183,6 +259,7 @@ export default function DocRenderer({ entries }: DocRendererProps) {
         </button>
       </div>
       <div
+        ref={markdownBodyRef}
         className="markdown-body"
         dangerouslySetInnerHTML={{ __html: state.html }}
       />

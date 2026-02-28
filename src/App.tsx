@@ -3,23 +3,27 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import ThemeToggle from "./components/ThemeToggle";
 import DocRenderer from "./components/DocRenderer";
+import LanguageSwitcher from "./components/LanguageSwitcher";
 import HomePage from "./pages/HomePage";
 import { useTheme } from "./hooks/useTheme";
+import { useI18n } from "./i18n";
 import { fetchManifest, flattenEntries, docPathToRoute } from "./utils/docs";
 import type { DocEntry } from "./utils/docs";
 
 export default function App() {
   const { theme, toggleTheme } = useTheme();
+  const { locale } = useI18n();
   const [entries, setEntries] = useState<DocEntry[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchManifest()
+    setLoading(true);
+    fetchManifest(locale)
       .then(setEntries)
       .catch((err) => console.error("Failed to load manifest:", err))
       .finally(() => setLoading(false));
-  }, []);
+  }, [locale]);
 
   const routes = useMemo(() => {
     const flat = flattenEntries(entries);
@@ -59,6 +63,7 @@ export default function App() {
             </a>
           </div>
           <div className="header-right">
+            <LanguageSwitcher />
             <ThemeToggle theme={theme} onToggle={toggleTheme} />
           </div>
         </header>
