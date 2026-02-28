@@ -58,16 +58,39 @@ export function flattenEntries(
 }
 
 /**
- * Calculate the route path from a doc file path.
- * e.g., /docs/en/01-getting-started/02-installation.md -> /getting-started/installation
+ * Calculate the route path from a doc file path, including the locale prefix.
+ * e.g., /docs/en/01-getting-started/02-installation.md -> /en/getting-started/installation
  */
 export function docPathToRoute(docPath: string): string {
-  return docPath
+  const localeMatch = docPath.match(/^\/docs\/([a-z]{2}(-[a-z]{2})?)/i);
+  const locale = localeMatch ? localeMatch[1].toLowerCase() : "en";
+
+  const cleanPath = docPath
     .replace(/^\/docs\/[a-z]{2}(-[a-z]{2})?/i, "") // strip /docs/{locale}
     .replace(/\.md$/, "")
     .replace(/\/index$/, "")
     .replace(/\/\d+-/g, "/")
     .replace(/^\/?/, "/");
+
+  return `/${locale}${cleanPath}`;
+}
+
+/**
+ * Extract locale code from a URL pathname.
+ * e.g., /en/introduction -> "en", /fr/getting-started -> "fr"
+ * Returns null if no locale prefix found.
+ */
+export function getLocaleFromPath(pathname: string): string | null {
+  const match = pathname.match(/^\/([a-z]{2})(\/|$)/);
+  return match ? match[1] : null;
+}
+
+/**
+ * Replace the locale prefix in a route with a new locale.
+ * e.g., switchRouteLocale("/en/introduction", "fr") -> "/fr/introduction"
+ */
+export function switchRouteLocale(route: string, newLocale: string): string {
+  return route.replace(/^\/[a-z]{2}(\/|$)/, `/${newLocale}$1`);
 }
 
 /**

@@ -38,6 +38,90 @@ interface DocRendererProps {
 }
 
 /**
+ * Rehype plugin that wraps <pre> code blocks in a container with a language
+ * label and a copy-to-clipboard button.
+ */
+function rehypeCodeBlockMeta() {
+  return (tree: Root) => {
+    visit(tree, "element", (node: Element, index, parent) => {
+      if (
+        node.tagName !== "pre" ||
+        !parent ||
+        index === undefined ||
+        index === null
+      )
+        return;
+
+      // Detect language from the <code> child's class (language-xxx) or from
+      // Shiki's data attributes.
+      let lang = "";
+      const codeChild = node.children.find(
+        (c): c is Element => c.type === "element" && c.tagName === "code",
+      );
+      if (codeChild) {
+        const classes = (codeChild.properties?.className as string[]) || [];
+        const langClass = classes.find((c) => c.startsWith("language-"));
+        if (langClass) lang = langClass.replace("language-", "");
+      }
+      // Shiki sometimes stores language in the class of <pre> itself
+      if (!lang) {
+        const preClasses = (node.properties?.className as string[]) || [];
+        const langClass = preClasses.find((c) => c.startsWith("language-"));
+        if (langClass) lang = langClass.replace("language-", "");
+      }
+
+      const header: Element = {
+        type: "element",
+        tagName: "div",
+        properties: { className: ["code-block-header"] },
+        children: [
+          {
+            type: "element",
+            tagName: "span",
+            properties: { className: ["code-block-lang"] },
+            children: [{ type: "text", value: lang || "code" }],
+          },
+          {
+            type: "element",
+            tagName: "button",
+            properties: {
+              type: "button",
+              className: ["code-copy-btn"],
+              "aria-label": "Copy code",
+              title: "Copy code",
+            },
+            children: [
+              {
+                type: "element",
+                tagName: "span",
+                properties: { className: ["code-copy-icon"] },
+                children: [{ type: "text", value: "📋" }],
+              },
+              {
+                type: "element",
+                tagName: "span",
+                properties: { className: ["code-copy-label"] },
+                children: [{ type: "text", value: "Copy" }],
+              },
+            ],
+          },
+        ],
+      };
+
+      const wrapper: Element = {
+        type: "element",
+        tagName: "div",
+        properties: { className: ["code-block-wrapper"] },
+        children: [header, { ...node }],
+      };
+
+      // Replace the <pre> with the wrapper in the parent
+      (parent as Element).children[index] = wrapper;
+    });
+  };
+}
+
+/**
  * Rehype plugin that adds anchor links to headings (h1-h6) that have an id.
  * Produces markup compatible with the existing .heading-anchor-group CSS.
  */
@@ -104,6 +188,7 @@ async function renderMarkdown(
     })
     .use(rehypeSlug)
     .use(rehypeHeadingAnchors)
+    .use(rehypeCodeBlockMeta)
     .use(rehypeStringify, { allowDangerousHtml: true })
     .process(md);
   return String(result);
@@ -174,23 +259,43 @@ export default function DocRenderer({ entries }: DocRendererProps) {
     }
   }, [state, location.hash]);
 
-  // Attach click handlers for anchor copy-link behaviour
+  // Attach click handlers for anchor copy-link and code block copy button
   useEffect(() => {
     if (state.status !== "ready" || !markdownBodyRef.current) return;
     const container = markdownBodyRef.current;
 
     const handleClick = (e: MouseEvent) => {
+      // --- Heading anchor copy ---
       const anchor = (e.target as HTMLElement).closest<HTMLAnchorElement>(
         "a.heading-anchor[data-anchor]",
       );
-      if (!anchor) return;
-      e.preventDefault();
-      const slug = anchor.dataset.anchor!;
-      const url = `${window.location.origin}${window.location.pathname}#${slug}`;
-      navigator.clipboard.writeText(url).then(() => {
-        anchor.classList.add("copied");
-        setTimeout(() => anchor.classList.remove("copied"), 2000);
-      });
+      if (anchor) {
+        e.preventDefault();
+        const slug = anchor.dataset.anchor!;
+        const url = `${window.location.origin}${window.location.pathname}#${slug}`;
+        navigator.clipboard.writeText(url).then(() => {
+          anchor.classList.add("copied");
+          setTimeout(() => anchor.classList.remove("copied"), 2000);
+        });
+        return;
+      }
+
+      // --- Code block copy button ---
+      const copyBtn = (e.target as HTMLElement).closest<HTMLButtonElement>(
+        "button.code-copy-btn",
+      );
+      if (copyBtn) {
+        e.preventDefault();
+        const wrapper = copyBtn.closest(".code-block-wrapper");
+        const codeEl = wrapper?.querySelector("pre code");
+        if (!codeEl) return;
+        const text = codeEl.textContent || "";
+        navigator.clipboard.writeText(text).then(() => {
+          copyBtn.classList.add("copied");
+          setTimeout(() => copyBtn.classList.remove("copied"), 2000);
+        });
+        return;
+      }
     };
 
     container.addEventListener("click", handleClick);
@@ -202,7 +307,7 @@ export default function DocRenderer({ entries }: DocRendererProps) {
       <div className="not-found">
         <h1>404</h1>
         <p>{t.pageNotFound}</p>
-        <a href="/">{t.backToHome}</a>
+        <a href={`/${locale}/`}>{t.backToHome}</a>
       </div>
     );
   }
@@ -221,7 +326,7 @@ export default function DocRenderer({ entries }: DocRendererProps) {
       <div className="not-found">
         <h1>{t.error}</h1>
         <p>{t.unableToLoad}</p>
-        <a href="/">{t.backToHome}</a>
+        <a href={`/${locale}/`}>{t.backToHome}</a>
       </div>
     );
   }

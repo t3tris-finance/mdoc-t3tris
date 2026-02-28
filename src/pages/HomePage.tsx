@@ -18,7 +18,7 @@ export default function HomePage({ entries }: HomePageProps) {
       <SEO
         title="Documentation"
         description="T3tris Protocol documentation — a tokenized vault protocol built on ERC-4626 for professional asset management. Guides for liquidity providers, asset managers, and developers."
-        path="/"
+        path={`/${locale}/`}
         type="website"
         locale={locale}
       />

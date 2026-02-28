@@ -20,6 +20,14 @@ const localeRegistry: Record<Locale, LocaleConfig> = {
 const DEFAULT_LOCALE: Locale = "en";
 const STORAGE_KEY = "mdoc-locale";
 
+/** Set of supported locale codes */
+export const SUPPORTED_LOCALES = new Set(Object.keys(localeRegistry));
+
+/** Check if a locale code is supported */
+export function isValidLocale(code: string): code is Locale {
+  return SUPPORTED_LOCALES.has(code);
+}
+
 interface I18nContextValue {
   locale: Locale;
   t: Translations;
@@ -29,7 +37,11 @@ interface I18nContextValue {
 
 const I18nContext = createContext<I18nContextValue | null>(null);
 
-function getInitialLocale(): Locale {
+export function getInitialLocale(): Locale {
+  // 0. Check URL path for locale prefix
+  const pathMatch = window.location.pathname.match(/^\/([a-z]{2})(\/|$)/);
+  if (pathMatch && localeRegistry[pathMatch[1]]) return pathMatch[1];
+
   // 1. Check localStorage
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored && localeRegistry[stored]) return stored;

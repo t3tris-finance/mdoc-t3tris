@@ -7,11 +7,11 @@ interface BreadcrumbProps {
 }
 
 export default function Breadcrumb({ items, current }: BreadcrumbProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   return (
     <div className="breadcrumb">
-      <Link to="/">🏠 {t.home}</Link>
+      <Link to={`/${locale}/`}>🏠 {t.home}</Link>
       {items.map((item, i) => (
         <span key={i}>
           <span className="separator"> › </span>

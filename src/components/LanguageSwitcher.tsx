@@ -1,9 +1,13 @@
 import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useI18n } from "../i18n";
+import { switchRouteLocale } from "../utils/docs";
 
 export default function LanguageSwitcher() {
   const { locale, setLocale, availableLocales } = useI18n();
   const [open, setOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const current = availableLocales.find((l) => l.code === locale);
 
@@ -31,6 +35,11 @@ export default function LanguageSwitcher() {
                 className={`language-menu-item ${loc.code === locale ? "active" : ""}`}
                 onClick={() => {
                   setLocale(loc.code);
+                  const newPath = switchRouteLocale(
+                    location.pathname,
+                    loc.code,
+                  );
+                  navigate(newPath);
                   setOpen(false);
                 }}
               >

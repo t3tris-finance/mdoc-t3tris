@@ -32,12 +32,17 @@ interface DocEntry {
 }
 
 function docPathToRoute(docPath: string): string {
-  return docPath
+  const localeMatch = docPath.match(/^\/docs\/([a-z]{2}(-[a-z]{2})?)/i);
+  const locale = localeMatch ? localeMatch[1].toLowerCase() : "en";
+
+  const cleanPath = docPath
     .replace(/^\/docs\/[a-z]{2}(-[a-z]{2})?/i, "")
     .replace(/\.md$/, "")
     .replace(/\/index$/, "")
     .replace(/\/\d+-/g, "/")
     .replace(/^\/?/, "/");
+
+  return `/${locale}${cleanPath}`;
 }
 
 function flattenEntries(

@@ -27,12 +27,17 @@ interface DocEntry {
  * e.g., /docs/en/02-liquidity-providers/01-getting-started.md -> /liquidity-providers/getting-started
  */
 function docPathToRoute(docPath: string): string {
-  return docPath
+  const localeMatch = docPath.match(/^\/docs\/([a-z]{2}(-[a-z]{2})?)/i);
+  const locale = localeMatch ? localeMatch[1].toLowerCase() : "en";
+
+  const cleanPath = docPath
     .replace(/^\/docs\/[a-z]{2}(-[a-z]{2})?/i, "")
     .replace(/\.md$/, "")
     .replace(/\/index$/, "")
     .replace(/\/\d+-/g, "/")
     .replace(/^\/?/, "/");
+
+  return `/${locale}${cleanPath}`;
 }
 
 /**
@@ -83,9 +88,17 @@ allRoutes.add("/");
 routeLastMods.set("/", new Date().toISOString().split("T")[0]);
 
 for (const manifestFile of manifestFiles) {
+  const locale = manifestFile
+    .replace("docs-manifest.", "")
+    .replace(".json", "");
   const manifest: DocEntry[] = JSON.parse(
     readFileSync(join(publicDir, manifestFile), "utf-8"),
   );
+
+  // Add locale home page
+  allRoutes.add(`/${locale}`);
+  routeLastMods.set(`/${locale}`, new Date().toISOString().split("T")[0]);
+
   const routes = flattenRoutes(manifest);
 
   for (const route of routes) {
